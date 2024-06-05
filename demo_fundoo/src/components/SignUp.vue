@@ -3,6 +3,8 @@
 </script>
 
 <template>
+    <a href="./Register"><button>Register</button></a>
+    <a href="./Login"><button>Login</button></a>
     <div class="outer">
         <svg xmlns="https://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"
             jsname="jjf7Ff">
@@ -126,10 +128,9 @@ a {
 }
 
 a:hover {
-    background-color: rgb(227, 229, 229);
+    background-color: rgb(241, 246, 251);
     cursor: pointer;
     border-radius: 6px;
-    padding: 2px;
 }
 
 #lang {
