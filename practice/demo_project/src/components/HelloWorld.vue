@@ -1,14 +1,19 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
+    <ParentCom/>
   </div>
 </template>
 
 <script>
+import ParentCom from "./ParentCom.vue";
 export default {
   name: 'HelloWorld',
   props: {
     msg: String
+  },
+  components:{
+    ParentCom
   }
 }
 </script>
