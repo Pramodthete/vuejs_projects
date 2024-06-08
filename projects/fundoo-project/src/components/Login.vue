@@ -1,9 +1,10 @@
 <script>
+import { loginData } from '../services/userServices.js'
 export default {
   data: () => ({
     email: null,
     password: null,
-    formHasErrors: false,
+    show1: false,
     rules: {
       required: [
         (v) => !!v || 'This field is required',
@@ -18,7 +19,7 @@ export default {
       email: [
         (v) => !!v || 'This field is required',
         (v) => {
-          if (/^[a-z.-]+@[a-z.-]+\.[a-z]+$/i.test(v)) {
+          if (/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i.test(v)) {
             return true
           } else {
             return 'Must be a valid e-mail.'
@@ -37,28 +38,30 @@ export default {
     }
   },
 
-  //   watch: {
-  //     name() {
-  //       this.errorMessages = ''
-  //     }
-  //   },
-
   methods: {
-    addressCheck() {
-      this.errorMessages = this.eamil && !this.password ? `Hey! I'm required` : ''
-
-      return true
-    },
     resetForm() {
-      this.errorMessages = []
-      this.formHasErrors = false
-
-      Object.keys(this.form).forEach((f) => {
-        this.$refs[f].reset()
-      })
+      console.log(this.form)
+      ;(this.form.email = null), (this.form.password = null)
+    },
+    handleLogin() {
+      const data = { email: this.eamil, password: this.password }
+      loginData(data)
     },
     submit() {
-      alert('User Login Successfully')
+      if (this.form.email != null && this.form.password != null) {
+        const data = { email: this.form.email, password: this.form.password }
+        console.log('This is from server: _____>>>>>', loginData(data))
+        loginData(data)
+          .then((response) => {
+            console.log('This is from server: _____>>>>>', response.data)
+          })
+          .catch((error) => {
+            console.error('Error logging in:', error)
+          })
+        this.resetForm()
+        this.$router.push({ name: 'signup' })
+        alert('User Login Successfully')
+      }
     }
   }
 }
@@ -68,6 +71,7 @@ export default {
   <div class="outerDiv">
     <div class="innerDiv">
       <img
+        id="google-img"
         src="https://logowik.com/content/uploads/images/google-logo-2020.jpg"
         width="120px"
         alt=""
@@ -102,7 +106,7 @@ export default {
                 :rules="rules.required"
                 required
               ></v-text-field>
-              <div>
+              <div class="bottom-text">
                 Not your Computer? Use a Private browsing window to sign in.
                 <a href="">Learn more</a>
               </div>
@@ -129,12 +133,14 @@ export default {
 </template>
 
 <style scoped>
+#google-img {
+  margin-bottom: -9%;
+}
 .outerDiv {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  text-align: center;
   padding: 1%;
   border-radius: 15px;
   border: 1px solid rgb(206, 205, 205);
@@ -143,6 +149,7 @@ export default {
 }
 .innerDiv {
   padding: 2%;
+  text-align: center;
 }
 .box {
   display: flex;
@@ -150,15 +157,18 @@ export default {
   justify-content: space-between;
   margin-top: 2%;
 }
-.input {
-  width: 460px;
+
+.bottom-text {
+  margin-top: 2%;
 }
 
 @media screen and (max-width: 1000px) {
   .outerDiv {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: fit-content;
+    border: none;
+  }
+  .box {
+    width: fit-content;
   }
 }
 #register-link1 {
@@ -169,7 +179,7 @@ export default {
   margin-top: 2%;
 }
 #btn-login {
-  background-color: rgb(70, 70, 243);
+  background-color: rgb(77, 94, 248);
   color: white;
 }
 .link-box {

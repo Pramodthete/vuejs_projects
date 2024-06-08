@@ -16,17 +16,22 @@ export default {
       min: (v) => v.length >= 8 || 'Min 8 characters',
       nameRules: [
         (v) => !!v || 'This Field is required',
-        (v) => (v && v.length >= 3) || 'Should be more than 2 characters'
+        (v) => (v && v.length >= 3) || 'Should be more than 2 characters',
+        (value) => {
+          if (/[^0-9]/.test(value)) return true
+
+          return 'name can not contain digits.'
+        }
       ],
       emailRules: [
-        (v) => !!v || 'This field is required'
-        //   (v) => {
-        //     if (/^[a-z.-]+@[a-z.-]+\.[a-z]+$/i.test(v)) {
-        //       return true
-        //     } else {
-        //       return 'Must be a valid e-mail.'
-        //     }
-        //   }
+        (v) => !!v || 'This field is required',
+        (v) => {
+          if (/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i.test(v)) {
+            return true
+          } else {
+            return 'Must be a valid e-mail.'
+          }
+        }
       ],
       passwordRules: [
         (v) => !!v || 'This field is required',
@@ -54,37 +59,42 @@ export default {
     }
   },
 
-  //   watch: {
-  //     name() {
-  //       this.errorMessages = ''
-  //     }
-  //   },
-
   methods: {
-    checkPass() {},
-    addressCheck() {
-      this.errorMessages =
-        this.eamil && !this.firstName && !this.lastName && !this.password ? `Hey! I'm required` : ''
+    // async validate() {
+    //   const { valid } = await this.$refs.form.validate()
 
-      return true
-    },
+    //   if (valid) alert('Form is valid')
+    // },
+    // checkPass() {
+    //   if (this.form.confirm != this.form.password) {
+    //     this.confirmRules = (value) => !!value || 'Confirm Password must be same as Password'
+    //   }
+    // },
+
     resetForm() {
       console.log(this.form)
       ;(this.firstName = null),
         (this.lastName = null),
         (this.email = null),
         (this.password = null),
-        (this.confirm = null),
-        (this.formHasErrors = false)
+        (this.confirm = null)
+      // this.$refs.form.reset()
     },
     submit() {
-      this.formHasErrors = false
-      if (this.form.confirm != this.form.password) {
-        alert('Confirm Password must be same as Paaword')
-      } else {
-        this.resetForm()
-        this.$router.push({ name: 'login' })
-        alert('Form Submited Successfully')
+      if (
+        this.firstName != null &&
+        this.lastName != null &&
+        this.email != null &&
+        this.password != null &&
+        this.confirm != null
+      ) {
+        if (this.form.confirm != this.form.password) {
+          alert('Confirm Password must be same as Paaword')
+        } else {
+          this.resetForm()
+          this.$router.push({ name: 'login' })
+          alert('Form Submited Successfully')
+        }
       }
     }
   }
@@ -95,11 +105,12 @@ export default {
   <div class="outerBox">
     <div class="innerBox">
       <img
+        id="google-img"
         src="https://logowik.com/content/uploads/images/google-logo-2020.jpg"
         width="120px"
         alt=""
       />
-      <h1><b>Create Your Google Account</b></h1>
+      <h1>Create Your Google Account</h1>
     </div>
     <div class="box">
       <div>
@@ -125,8 +136,7 @@ export default {
                   ></v-text-field>
                 </div>
                 <v-text-field
-                  label="Username"
-                  suffix="@gmail.com"
+                  label="Email"
                   variant="outlined"
                   v-model="email"
                   :rules="rules.emailRules"
@@ -147,11 +157,9 @@ export default {
                     @click:append="show1 = !show1"
                   ></v-text-field>
                   <v-text-field
-                    onchange="checkPass()"
                     class="icon-eye"
                     v-model="confirm"
                     variant="outlined"
-                    :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
                     :rules="rules.confirmRules"
                     :type="show1 ? 'text' : 'password'"
                     label="Confirm"
@@ -159,6 +167,13 @@ export default {
                     @click:append="show1 = !show1"
                   ></v-text-field>
                 </div>
+                <v-checkbox
+                  class="checkBox"
+                  v-model="show1"
+                  label="Show Password"
+                  :type="show1 ? 'text' : 'password'"
+                  @click:append="show1 = !show1"
+                ></v-checkbox>
                 <div class="text-ib">
                   <b>Use 8 or more Characters witha mix of letters,numbers and symbols</b>
                 </div>
@@ -209,6 +224,13 @@ export default {
 </template>
 
 <style scoped>
+#google-img {
+  margin-bottom: -3%;
+}
+h1 {
+  letter-spacing: -1px;
+  font-weight: 400;
+}
 input {
   height: 10px;
 }
@@ -230,6 +252,7 @@ input {
   display: flex;
   flex-direction: column;
   padding: 1%;
+  padding-left: 2%;
   border-radius: 15px;
   border: 1px solid rgb(184, 183, 183);
   background-color: white;
@@ -241,9 +264,12 @@ input {
   padding-bottom: 4%;
 }
 #email-text {
-  color: rgb(70, 70, 243);
+  color: rgb(77, 94, 248);
   cursor: pointer;
   padding-top: 2%;
+}
+.checkBox {
+  margin-top: -5%;
 }
 .img-col {
   margin-right: -32%;
@@ -252,6 +278,7 @@ input {
 @media screen and (max-width: 800px) {
   .outerBox {
     width: fit-content;
+    border: none;
   }
   .inputName {
     display: flex;
@@ -278,10 +305,10 @@ input {
 }
 .login-link {
   text-decoration: none;
-  color: rgb(70, 70, 243);
+  color: rgb(77, 94, 248);
 }
 #btn-s {
-  background-color: rgb(70, 70, 243);
+  background-color: rgb(92, 108, 251);
   color: white;
 }
 .foot {

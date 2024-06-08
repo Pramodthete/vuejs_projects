@@ -2,12 +2,11 @@
 export default {
   data: () => ({
     email: null,
-    formHasErrors: false,
     rules: {
       email: [
         (v) => !!v || 'This field is required',
         (v) => {
-          if (/^[a-z.-]+@[a-z.-]+\.[a-z]+$/i.test(v)) {
+          if (/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i.test(v)) {
             return true
           } else {
             return 'Must be a valid e-mail.'
@@ -20,32 +19,22 @@ export default {
   computed: {
     form() {
       return {
-        email: this.email,
-        password: this.password
+        email: this.email
       }
     }
   },
 
-  //   watch: {
-  //     name() {
-  //       this.errorMessages = ''
-  //     }
-  //   },
-
   methods: {
-    addressCheck() {
-      this.errorMessages = this.eamil && !this.password ? `Hey! I'm required` : ''
-
-      return true
-    },
     resetForm() {
-      this.errorMessages = []
-      this.formHasErrors = false
-
-      email = null
+      console.log(this.form)
+      this.email = null
     },
     toPassword() {
-      alert('Successfully Send Varification Mail to your email address')
+      if (this.form.email != null) {
+        this.resetForm()
+        this.$router.push({ name: 'resetPassword' })
+        alert('Successfully Send Varification Mail to your email address')
+      }
     }
   }
 }
@@ -55,6 +44,7 @@ export default {
   <div class="outerDiv">
     <div class="innerDiv">
       <img
+        id="google-img"
         src="https://logowik.com/content/uploads/images/google-logo-2020.jpg"
         width="120px"
         alt=""
@@ -87,10 +77,8 @@ export default {
                 </div>
 
                 <v-col cols="auto">
-                  <router-link to="/resetPassword"
-                    ><v-btn id="btn-login" density="default" type="submit" @click="toPassword()"
-                      >Next</v-btn
-                    ></router-link
+                  <v-btn id="btn-login" density="default" type="submit" @click="toPassword()"
+                    >Next</v-btn
                   >
                 </v-col>
               </div>
@@ -103,12 +91,14 @@ export default {
 </template>
 
 <style scoped>
+#google-img {
+  margin-bottom: -9%;
+}
 .outerDiv {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  text-align: center;
   padding: 1%;
   border-radius: 15px;
   border: 1px solid rgb(206, 205, 205);
@@ -117,6 +107,7 @@ export default {
 }
 .innerDiv {
   padding: 2%;
+  text-align: center;
 }
 .box {
   display: flex;
@@ -130,9 +121,11 @@ export default {
 
 @media screen and (max-width: 1000px) {
   .outerDiv {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: fit-content;
+    border: none;
+  }
+  .box {
+    width: fit-content;
   }
 }
 #register-link1 {

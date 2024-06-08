@@ -29,12 +29,6 @@ export default {
     }
   },
 
-  //   watch: {
-  //     name() {
-  //       this.errorMessages = ''
-  //     }
-  //   },
-
   methods: {
     addressCheck() {
       this.errorMessages = this.eamil && !this.password ? `Hey! I'm required` : ''
@@ -42,8 +36,6 @@ export default {
       return true
     },
     resetForm() {
-      this.errorMessages = []
-      this.formHasErrors = false
       this.confirm = null
       this.password = null
     },
@@ -64,6 +56,7 @@ export default {
   <div class="outerDiv">
     <div class="innerDiv">
       <img
+        id="google-img"
         src="https://logowik.com/content/uploads/images/google-logo-2020.jpg"
         width="120px"
         alt=""
@@ -95,8 +88,15 @@ export default {
                 hint="At least 8 characters"
                 v-model="confirm"
                 :rules="rules.confirm"
-                required
+                counter
               ></v-text-field>
+              <v-checkbox
+                class="checkBox"
+                v-model="show1"
+                label="Show Password"
+                :type="show1 ? 'text' : 'password'"
+                @click:append="show1 = !show1"
+              ></v-checkbox>
 
               <div class="box">
                 <div class="link-box">
@@ -116,12 +116,14 @@ export default {
 </template>
 
 <style scoped>
+#google-img {
+  margin-bottom: -8%;
+}
 .outerDiv {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  text-align: center;
   padding: 1%;
   border-radius: 15px;
   border: 1px solid rgb(206, 205, 205);
@@ -130,6 +132,7 @@ export default {
 }
 .innerDiv {
   padding: 2%;
+  text-align: center;
 }
 .box {
   display: flex;
@@ -143,9 +146,15 @@ export default {
 
 @media screen and (max-width: 1000px) {
   .outerDiv {
-    display: flex;
     justify-content: center;
-    align-items: center;
+    width: fit-content;
+    border: none;
+  }
+  .box {
+    width: fit-content;
+  }
+  .input {
+    width: initial;
   }
 }
 #register-link1 {
