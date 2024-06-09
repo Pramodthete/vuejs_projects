@@ -1,30 +1,28 @@
 <script>
 import { loginData } from '../services/userServices.js'
+import SnackBar from './SnackBar.vue'
+import ResetPassword from './ResetPassword.vue'
+
 export default {
+  components: { SnackBar, ResetPassword },
   data: () => ({
     email: null,
     password: null,
     show1: false,
+    snackbar: false,
+    snackbarText: '',
+    loginToken: '',
     rules: {
-      required: [
-        (v) => !!v || 'This field is required',
-        (v) => {
-          if (/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(v)) {
-            return true
-          } else {
-            return 'Must be Valid Password'
-          }
-        }
-      ],
       email: [
         (v) => !!v || 'This field is required',
-        (v) => {
-          if (/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i.test(v)) {
-            return true
-          } else {
-            return 'Must be a valid e-mail.'
-          }
-        }
+        (v) =>
+          /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i.test(v) || 'Must be a valid e-mail.'
+      ],
+      password: [
+        (v) => !!v || 'This field is required'
+        // (v) =>
+        //   /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(v) ||
+        //   'Must be a valid password'
       ]
     }
   }),
@@ -33,101 +31,141 @@ export default {
     form() {
       return {
         email: this.email,
-        password: this.password
+        password: this.password,
+        loginToken: this.loginToken
       }
+    },
+    isFormValid() {
+      return (
+        this.email &&
+        this.password &&
+        this.rules.email.every((rule) => rule(this.email) === true) &&
+        this.rules.password.every((rule) => rule(this.password) === true)
+      )
     }
   },
 
   methods: {
     resetForm() {
-      console.log(this.form)
-      ;(this.form.email = null), (this.form.password = null)
+      this.email = null
+      this.password = null
     },
     handleLogin() {
-      const data = { email: this.eamil, password: this.password }
+      const data = { email: this.email, password: this.password }
       loginData(data)
+        .then((data) => {
+          this.snackbarText = 'User logged in successfully!'
+          this.snackbar = true
+          this.resetForm()
+          // this.$router.push({ name: 'signup' })
+          this.loginToken = data.data.id
+          console.log('login token------->>>>>>', this.loginToken)
+          console.log('This is from server: _____>>>>>', data)
+          setTimeout(() => {
+            this.$router.push({ name: 'resetPassword' })
+          }, 2000)
+        })
+        .catch((error) => {
+          this.snackbarText = 'Error logging in. Please try again.'
+          this.snackbar = true
+          console.log('Error logging in:', error)
+          console.log('Error message:', error.message)
+          console.log('Error response data:', error.response ? error.response.data : null)
+          console.log('Error response status:', error.response ? error.response.status : null)
+        })
+    },
+    validateForm() {
+      return this.$refs.form.validate()
     },
     submit() {
-      if (this.form.email != null && this.form.password != null) {
-        const data = { email: this.form.email, password: this.form.password }
-        console.log('This is from server: _____>>>>>', loginData(data))
-        loginData(data)
-          .then((response) => {
-            console.log('This is from server: _____>>>>>', response.data)
-          })
-          .catch((error) => {
-            console.error('Error logging in:', error)
-          })
-        this.resetForm()
-        this.$router.push({ name: 'signup' })
-        alert('User Login Successfully')
-      }
+      this.validateForm().then((isValid) => {
+        if (isValid) {
+          this.handleLogin()
+        } else {
+          this.snackbarText = 'Please correct the errors before submitting.'
+          this.snackbar = true
+        }
+      })
     }
   }
 }
 </script>
 
 <template>
-  <div class="outerDiv">
-    <div class="innerDiv">
-      <img
-        id="google-img"
-        src="https://logowik.com/content/uploads/images/google-logo-2020.jpg"
-        width="120px"
-        alt=""
-      />
-      <h1>Sign in</h1>
-      <h2>Use your google account</h2>
-    </div>
+  <div>
+    <ResetPassword :token="loginToken" v-if="false" />
 
-    <div class="box">
-      <v-form>
-        <v-container fluid>
-          <v-row>
-            <v-col>
-              <v-text-field
-                class="input"
-                label="Email"
-                variant="outlined"
-                hint="e.g : demo11@example.com"
-                ref="email"
-                v-model="email"
-                :rules="rules.email"
-                required
-              ></v-text-field
-              ><br />
-              <v-text-field
-                class="input"
-                label="Password"
-                variant="outlined"
-                :type="show1 ? show1 : 'password'"
-                hint="At least 8 characters"
-                v-model="password"
-                :rules="rules.required"
-                required
-              ></v-text-field>
-              <div class="bottom-text">
-                Not your Computer? Use a Private browsing window to sign in.
-                <a href="">Learn more</a>
-              </div>
-              <div class="box">
-                <div class="link-box">
-                  <router-link id="register-link1" to="/register">Create Account</router-link>
-                  <router-link id="register-link2" to="/forgotPassword"
-                    >Forgot Password?</router-link
-                  >
+    <SnackBar :snackbar.sync="snackbar" :text="snackbarText" @update:snackbar="snackbar = $event" />
+
+    <div class="outerDiv">
+      <div class="innerDiv">
+        <img
+          id="google-img"
+          src="https://logowik.com/content/uploads/images/google-logo-2020.jpg"
+          width="120px"
+          alt=""
+        />
+        <h1>Sign in</h1>
+        <h2>Use your Google account</h2>
+      </div>
+
+      <div class="box">
+        <v-form ref="form" @submit.prevent="submit">
+          <v-container fluid>
+            <v-row>
+              <v-col>
+                <v-text-field
+                  class="input"
+                  label="Email"
+                  variant="outlined"
+                  hint="e.g : demo11@example.com"
+                  ref="email"
+                  v-model="email"
+                  :rules="rules.email"
+                  required
+                ></v-text-field>
+                <br />
+                <v-text-field
+                  class="input"
+                  label="Password"
+                  variant="outlined"
+                  :type="show1 ? 'text' : 'password'"
+                  hint="At least 8 characters"
+                  v-model="password"
+                  :rules="rules.password"
+                  required
+                  @click:append="show1 = !show1"
+                ></v-text-field>
+                <v-checkbox
+                  class="checkBox"
+                  v-model="show1"
+                  label="Show Password"
+                  :type="show1 ? 'text' : 'password'"
+                  @click:append="show1 = !show1"
+                ></v-checkbox>
+                <div class="bottom-text">
+                  Not your computer? Use a private browsing window to sign in.
+                  <a href="">Learn more</a>
                 </div>
+                <div class="box">
+                  <div class="link-box">
+                    <router-link id="register-link1" to="/register">Create account</router-link>
+                    <router-link id="register-link2" to="/forgotPassword"
+                      >Forgot password?</router-link
+                    >
+                  </div>
 
-                <v-col cols="auto">
-                  <v-btn id="btn-login" density="default" type="submit" @click="submit"
-                    >Login</v-btn
-                  >
-                </v-col>
-              </div>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-form>
+                  <v-col cols="auto">
+                    <v-btn id="btn-login" :disabled="!isFormValid" density="default" type="submit"
+                      >Login</v-btn
+                    >
+                  </v-col>
+                </div>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-form>
+      </div>
     </div>
   </div>
 </template>

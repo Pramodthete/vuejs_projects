@@ -1,7 +1,12 @@
 <script>
+import { forgotPassData } from '../services/userServices.js'
+import SnackBar from './SnackBar.vue'
 export default {
   data: () => ({
     email: null,
+    snackbar: false,
+    snackbarText: '',
+
     rules: {
       email: [
         (v) => !!v || 'This field is required',
@@ -21,19 +26,41 @@ export default {
       return {
         email: this.email
       }
+    },
+    isFormValid() {
+      return this.email && this.rules.email.every((rule) => rule(this.email) === true)
     }
   },
 
   methods: {
     resetForm() {
-      console.log(this.form)
       this.email = null
     },
     toPassword() {
-      if (this.form.email != null) {
-        this.resetForm()
-        this.$router.push({ name: 'resetPassword' })
-        alert('Successfully Send Varification Mail to your email address')
+      const data = { email: this.email }
+      if (
+        this.form.email != null &&
+        /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i.test(this.email) == true
+      ) {
+        forgotPassData(data)
+          .then((data) => {
+            this.snackbarText = 'Successfully Send Varification Mail to your email address'
+            this.snackbar = true
+            this.resetForm()
+            console.log(data)
+            setTimeout(() => {
+              this.$router.push({ name: 'resetPassword' })
+            }, 2000)
+          })
+          .catch((error) => {
+            this.snackbarText = 'Error in Forgot Password'
+            this.snackbar = true
+            console.log(error)
+          })
+      } else {
+        this.snackbarText = 'Invalid email'
+        this.snackbar = true
+        console.log('Invalid email')
       }
     }
   }
@@ -41,6 +68,7 @@ export default {
 </script>
 
 <template>
+  <SnackBar :snackbar.sync="snackbar" :text="snackbarText" @update:snackbar="snackbar = $event" />
   <div class="outerDiv">
     <div class="innerDiv">
       <img
@@ -54,7 +82,7 @@ export default {
     </div>
 
     <div class="box">
-      <v-form>
+      <v-form ref="form" @submit.prevent="toPassword">
         <v-container fluid>
           <v-row>
             <v-col>
@@ -68,16 +96,18 @@ export default {
                 :rules="rules.email"
                 required
               ></v-text-field>
-              <!-- <div>
-                <v-checkbox v-model="selected" label="" value=""></v-checkbox>
-              </div> -->
               <div class="box">
                 <div class="link-box">
-                  <router-link id="register-link1" to="/register">Forgot Email?</router-link>
+                  <router-link id="register-link1" to="/register">Email Recovery</router-link>
                 </div>
 
                 <v-col cols="auto">
-                  <v-btn id="btn-login" density="default" type="submit" @click="toPassword()"
+                  <v-btn
+                    id="btn-login"
+                    :disabled="!isFormValid"
+                    density="default"
+                    type="submit"
+                    @click="toPassword()"
                     >Next</v-btn
                   >
                 </v-col>
@@ -126,6 +156,9 @@ export default {
   }
   .box {
     width: fit-content;
+  }
+  .input {
+    width: initial;
   }
 }
 #register-link1 {

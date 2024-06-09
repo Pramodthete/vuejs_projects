@@ -1,5 +1,9 @@
 <script>
+import { registerData } from '../services/userServices.js'
+import SnackBar from './SnackBar.vue'
+
 export default {
+  components: { SnackBar },
   data: () => ({
     firstName: null,
     lastName: null,
@@ -7,43 +11,38 @@ export default {
     password: null,
     confirm: null,
     formHasErrors: false,
-
     show1: false,
     show2: true,
     passwordArr: null,
+    snackbar: false,
+    snackbarText: '',
+    errors: {
+      firstName: null,
+      lastName: null,
+      email: null,
+      password: null,
+      confirm: null
+    },
     rules: {
       required: (value) => !!value || 'Required.',
       min: (v) => v.length >= 8 || 'Min 8 characters',
       nameRules: [
         (v) => !!v || 'This Field is required',
         (v) => (v && v.length >= 3) || 'Should be more than 2 characters',
-        (value) => {
-          if (/[^0-9]/.test(value)) return true
-
-          return 'name can not contain digits.'
-        }
+        (value) => /[^0-9]/.test(value) || 'Name cannot contain digits.'
       ],
       emailRules: [
         (v) => !!v || 'This field is required',
-        (v) => {
-          if (/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i.test(v)) {
-            return true
-          } else {
-            return 'Must be a valid e-mail.'
-          }
-        }
+        (v) =>
+          /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i.test(v) || 'Must be a valid e-mail.'
       ],
       passwordRules: [
         (v) => !!v || 'This field is required',
-        (v) => {
-          if (/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(v)) {
-            return true
-          } else {
-            return 'Must be Valid Password'
-          }
-        }
+        (v) =>
+          /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(v) ||
+          'Must be a valid password'
       ],
-      confirmRules: [(value) => !!value || 'Type confirm password']
+      confirmRules: [(v) => !!v || 'This field is required']
     }
   }),
 
@@ -56,45 +55,94 @@ export default {
         password: this.password,
         confirm: this.confirm
       }
+    },
+    isFormValid() {
+      return (
+        this.firstName &&
+        this.lastName &&
+        this.email &&
+        this.password &&
+        this.confirm &&
+        this.rules.nameRules.every((rule) => rule(this.firstName) === true) &&
+        this.rules.nameRules.every((rule) => rule(this.lastName) === true) &&
+        this.rules.emailRules.every((rule) => rule(this.email) === true) &&
+        this.rules.passwordRules.every((rule) => rule(this.password) === true) &&
+        this.rules.confirmRules.every((rule) => rule(this.confirm) === true)
+      )
     }
   },
 
   methods: {
-    // async validate() {
-    //   const { valid } = await this.$refs.form.validate()
+    validateField(fieldName, value) {
+      const rules = this.rules[`${fieldName}Rules`]
+      if (Array.isArray(rules)) {
+        for (let rule of rules) {
+          const errorMessage = rule(value)
+          if (errorMessage !== true) {
+            this.errors[fieldName] = errorMessage
+            return false
+          }
+        }
+      }
+      this.errors[fieldName] = null
+      return true
+    },
 
-    //   if (valid) alert('Form is valid')
-    // },
-    // checkPass() {
-    //   if (this.form.confirm != this.form.password) {
-    //     this.confirmRules = (value) => !!value || 'Confirm Password must be same as Password'
-    //   }
-    // },
+    validateForm() {
+      let isValid = true
+      isValid = this.validateField('firstName', this.firstName) && isValid
+      isValid = this.validateField('lastName', this.lastName) && isValid
+      isValid = this.validateField('email', this.email) && isValid
+      isValid = this.validateField('password', this.password) && isValid
+      isValid = this.validateField('confirm', this.confirm) && isValid
+      return isValid
+    },
 
     resetForm() {
       console.log(this.form)
-      ;(this.firstName = null),
-        (this.lastName = null),
-        (this.email = null),
-        (this.password = null),
-        (this.confirm = null)
-      // this.$refs.form.reset()
+      this.firstName = null
+      this.lastName = null
+      this.email = null
+      this.password = null
+      this.confirm = null
+      this.errors = {
+        firstName: null,
+        lastName: null,
+        email: null,
+        password: null,
+        confirm: null
+      }
     },
     submit() {
-      if (
-        this.firstName != null &&
-        this.lastName != null &&
-        this.email != null &&
-        this.password != null &&
-        this.confirm != null
-      ) {
-        if (this.form.confirm != this.form.password) {
-          alert('Confirm Password must be same as Paaword')
-        } else {
-          this.resetForm()
-          this.$router.push({ name: 'login' })
-          alert('Form Submited Successfully')
-        }
+      const data = {
+        firstName: this.firstName,
+        lastName: this.lastName,
+        role: 'user',
+        service: 'advance',
+        createdDate: '2024-06-08T04:43:01.093Z',
+        modifiedDate: '2024-06-08T04:43:01.093Z',
+        email: this.email
+      }
+
+      if (this.validateForm()) {
+        registerData(data)
+          .then((data) => {
+            this.resetForm()
+            this.snackbarText = 'User Registerd successfully!'
+            this.snackbar = true
+            console.log('This is from server: _____>>>>>', data)
+            setTimeout(() => {
+              this.$router.push({ name: 'login' })
+            }, 2000)
+          })
+          .catch((error) => {
+            this.snackbarText = 'Error For Submiting Form'
+            this.snackbar = true
+            console.log('Error in register: _____>>>>>', error)
+          })
+      } else {
+        this.snackbarText = 'Please correct the errors before submitting.'
+        this.snackbar = true
       }
     }
   }
@@ -102,6 +150,7 @@ export default {
 </script>
 
 <template>
+  <SnackBar :snackbar.sync="snackbar" :text="snackbarText" @update:snackbar="snackbar = $event" />
   <div class="outerBox">
     <div class="innerBox">
       <img
@@ -114,7 +163,7 @@ export default {
     </div>
     <div class="box">
       <div>
-        <v-form>
+        <v-form @submit.prevent="submit">
           <v-container>
             <v-row>
               <v-col>
@@ -143,8 +192,8 @@ export default {
                   required
                 ></v-text-field>
                 <div class="text-ib">
-                  <b>You can use letters, numbers and Periods</b>
-                  <p id="email-text"><b>Use my Current Email address instead</b></p>
+                  <b>You can use letters, numbers, and periods</b>
+                  <p id="email-text"><b>Use my current email address instead</b></p>
                 </div>
                 <div class="inputName">
                   <v-text-field
@@ -175,14 +224,16 @@ export default {
                   @click:append="show1 = !show1"
                 ></v-checkbox>
                 <div class="text-ib">
-                  <b>Use 8 or more Characters witha mix of letters,numbers and symbols</b>
+                  <b>Use 8 or more characters with a mix of letters, numbers, and symbols</b>
                 </div>
                 <div class="last-btns">
                   <div>
                     <router-link id="login-link" to="/login"><b>Sign in instead</b></router-link>
                   </div>
                   <div>
-                    <v-btn id="btn-s" density="default" type="submit" @click="submit">Submit</v-btn>
+                    <v-btn id="btn-s" :disabled="!isFormValid" density="default" type="submit"
+                      >Submit</v-btn
+                    >
                   </div>
                 </div>
               </v-col>

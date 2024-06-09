@@ -1,10 +1,20 @@
 <script>
+import { resetPassData } from '../services/userServices.js'
+import SnackBar from './SnackBar.vue'
 export default {
   data: () => ({
     confirm: null,
     password: null,
     formHasErrors: false,
     show1: false,
+    snackbar: false,
+    snackbarText: '',
+    props: {
+      token: {
+        type: String,
+        default: ''
+      }
+    },
     rules: {
       required: [
         (v) => !!v || 'This field is required',
@@ -16,7 +26,16 @@ export default {
           }
         }
       ],
-      confirm: [(v) => !!v || 'This field is required']
+      confirm: [
+        (v) => !!v || 'This field is required',
+        (v) => {
+          if (/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(v)) {
+            return true
+          } else {
+            return 'Must be Valid Password'
+          }
+        }
+      ]
     }
   }),
 
@@ -24,8 +43,17 @@ export default {
     form() {
       return {
         confirm: this.confirm,
-        password: this.password
+        password: this.password,
+        tokenData: this.token
       }
+    },
+    isFormValid() {
+      return (
+        this.password &&
+        this.confirm &&
+        this.rules.confirm.every((rule) => rule(this.confirm) === true) &&
+        this.rules.required.every((rule) => rule(this.password) === true)
+      )
     }
   },
 
@@ -41,11 +69,31 @@ export default {
     },
     submit() {
       if (this.form.confirm != this.form.password) {
-        alert('Confirm Password must be same as Paaword')
+        this.snackbarText = 'Password and Confirm password must be same'
+        this.snackbar = true
       } else {
-        this.resetForm()
-        this.$router.push({ name: 'login' })
-        alert('Password Reset Successfully')
+        console.log('Iam here =============>')
+        console.log('token++++++>>>', this.tokenData)
+        const data = { newPassword: this.password }
+        const token = this.token
+        resetPassData(data, this.tokenData)
+          .then((data) => {
+            this.snackbarText = 'Password Reset Successfully'
+            this.snackbar = true
+            this.resetForm()
+            console.log(data)
+            setTimeout(() => {
+              this.$router.push({ name: 'login' })
+            }, 2000)
+          })
+          .catch((error) => {
+            this.snackbarText = 'Error in Reset Password'
+            this.snackbar = true
+            console.log(error)
+            console.log('Error message:', error.message)
+            console.log('Error response data:', error.response ? error.response.data : null)
+            console.log('Error response status:', error.response ? error.response.status : null)
+          })
       }
     }
   }
@@ -53,6 +101,7 @@ export default {
 </script>
 
 <template>
+  <SnackBar :snackbar.sync="snackbar" :text="snackbarText" @update:snackbar="snackbar = $event" />
   <div class="outerDiv">
     <div class="innerDiv">
       <img
@@ -65,7 +114,7 @@ export default {
     </div>
 
     <div class="box">
-      <v-form>
+      <v-form ref="form" @submit.prevent="submit">
         <v-container fluid>
           <v-row>
             <v-col>
@@ -104,7 +153,14 @@ export default {
                 </div>
 
                 <v-col cols="auto">
-                  <v-btn id="btn-login" density="default" type="submit" @click="submit">Save</v-btn>
+                  <v-btn
+                    id="btn-login"
+                    :disabled="!isFormValid"
+                    density="default"
+                    type="submit"
+                    @click="submit"
+                    >Save</v-btn
+                  >
                 </v-col>
               </div>
             </v-col>
