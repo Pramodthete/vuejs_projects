@@ -1,17 +1,15 @@
 <script>
 import { loginData } from '../services/userServices.js'
 import SnackBar from './SnackBar.vue'
-import ResetPassword from './ResetPassword.vue'
 
 export default {
-  components: { SnackBar, ResetPassword },
+  components: { SnackBar },
   data: () => ({
     email: null,
     password: null,
     show1: false,
     snackbar: false,
     snackbarText: '',
-    loginToken: '',
     rules: {
       email: [
         (v) => !!v || 'This field is required',
@@ -31,8 +29,7 @@ export default {
     form() {
       return {
         email: this.email,
-        password: this.password,
-        loginToken: this.loginToken
+        password: this.password
       }
     },
     isFormValid() {
@@ -58,8 +55,9 @@ export default {
           this.snackbar = true
           this.resetForm()
           // this.$router.push({ name: 'signup' })
-          this.loginToken = data.data.id
-          console.log('login token------->>>>>>', this.loginToken)
+          localStorage.setItem('loginToken', data.data.id)
+          console.log('Stored token:', localStorage.getItem('loginToken'))
+          console.log('login token------->>>>>>', data.data.id)
           console.log('This is from server: _____>>>>>', data)
           setTimeout(() => {
             this.$router.push({ name: 'resetPassword' })
@@ -93,8 +91,6 @@ export default {
 
 <template>
   <div>
-    <ResetPassword :token="loginToken" v-if="false" />
-
     <SnackBar :snackbar.sync="snackbar" :text="snackbarText" @update:snackbar="snackbar = $event" />
 
     <div class="outerDiv">

@@ -117,11 +117,9 @@ export default {
       const data = {
         firstName: this.firstName,
         lastName: this.lastName,
-        role: 'user',
         service: 'advance',
-        createdDate: '2024-06-08T04:43:01.093Z',
-        modifiedDate: '2024-06-08T04:43:01.093Z',
-        email: this.email
+        email: this.email,
+        password: this.password
       }
 
       if (this.validateForm()) {

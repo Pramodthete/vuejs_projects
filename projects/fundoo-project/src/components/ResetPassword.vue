@@ -9,12 +9,7 @@ export default {
     show1: false,
     snackbar: false,
     snackbarText: '',
-    props: {
-      token: {
-        type: String,
-        default: ''
-      }
-    },
+
     rules: {
       required: [
         (v) => !!v || 'This field is required',
@@ -43,8 +38,7 @@ export default {
     form() {
       return {
         confirm: this.confirm,
-        password: this.password,
-        tokenData: this.token
+        password: this.password
       }
     },
     isFormValid() {
@@ -72,11 +66,11 @@ export default {
         this.snackbarText = 'Password and Confirm password must be same'
         this.snackbar = true
       } else {
+        const token = localStorage.getItem('loginToken')
         console.log('Iam here =============>')
-        console.log('token++++++>>>', this.tokenData)
+        console.log('token++++++>>>', token)
         const data = { newPassword: this.password }
-        const token = this.token
-        resetPassData(data, this.tokenData)
+        resetPassData(data, token)
           .then((data) => {
             this.snackbarText = 'Password Reset Successfully'
             this.snackbar = true
