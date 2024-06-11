@@ -2,20 +2,9 @@
 export default {
   data() {
     return {
-      name: 'Hooks',
-      counter: 0
+      name: 'Hooks'
     }
   },
-  methods: {
-    incrementCounter() {
-      for (let index = 0; index < 5; index++) {
-        setTimeout(() => {
-          this.counter++
-        }, 1000)
-      }
-    }
-  },
-
   beforeCreate() {
     console.log('Before Create')
   },
@@ -45,22 +34,20 @@ export default {
 
 <template>
   <div>
-    <h1>Hello World</h1>
+    <h1>Demo vue</h1>
     <div class="box"></div>
-    <router-link id="register-link1" to="/demo">Demo with routerlink</router-link>
-  </div>
-  <div>
-    <h1>{{ name }}</h1>
-    <p>Counter: {{ counter }}</p>
-    <button @click="incrementCounter">Increment Counter</button>
+    <br />
+    <div class="box"></div>
+    <a href="/hooks">Hooks with anchor</a><br /><br />
+    <router-link id="register-link1" to="/hooks">Hooks with routerlink</router-link>
   </div>
 </template>
 
 <style scoped>
 .box {
-  width: 200px;
-  height: 300px;
-  background-color: aqua;
-  border: 3px solid tomato;
+  width: 100px;
+  height: 100px;
+  background-color: rgb(174, 144, 98);
+  border: 3px solid rgb(45, 188, 16);
 }
 </style>
