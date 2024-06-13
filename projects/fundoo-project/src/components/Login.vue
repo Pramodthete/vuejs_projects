@@ -60,7 +60,7 @@ export default {
           console.log('login token------->>>>>>', data.data.id)
           console.log('This is from server: _____>>>>>', data)
           setTimeout(() => {
-            this.$router.push({ name: 'dashboard' })
+            this.$router.push({ name: 'getAllNotes' })
           }, 2000)
         })
         .catch((error) => {

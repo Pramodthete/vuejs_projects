@@ -5,7 +5,9 @@ import ForgotPassword from '../views/ForgotPasswordView.vue'
 import ResetPassword from '../views/ResetPasswordView.vue'
 import Hooks from '../views/HooksView.vue'
 import Dashboard from '../views/DashboardView.vue'
-import Demo from '@/components/Demo.vue'
+import Demo from '@/views/DemoView.vue'
+import GetAllNotes from '@/components/GetAllNotes.vue'
+import IconButtons from '@/views/IconButtonsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,7 +20,14 @@ const router = createRouter({
     {
       path: '/dashboard',
       name: 'dashboard',
-      component: Dashboard
+      component: Dashboard,
+      children: [
+        {
+          path: '/dashboard/getAllNotes',
+          name: 'getAllNotes',
+          component: GetAllNotes
+        }
+      ]
     },
     {
       path: '/hooks',
@@ -30,6 +39,7 @@ const router = createRouter({
       name: 'demo',
       component: Demo
     },
+
     {
       path: '/register',
       name: 'register',
