@@ -25,7 +25,7 @@ a,
   body {
     display: flex;
     justify-content: center;
-    background-color: rgb(241, 246, 251);
+    background-color: white;
   }
 
   /* #app {

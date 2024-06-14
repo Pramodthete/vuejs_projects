@@ -1,17 +1,60 @@
-<script setup>
+<script>
 import CreateNote from './CreateNote.vue'
 import DisplayNote from './DisplayNote.vue'
+import { getNotesList } from '@/services/noteServices'
+export default {
+  data: () => ({
+    totalNotes: []
+  }),
+  components: {
+    CreateNote,
+    DisplayNote
+  },
+  mounted() {
+    this.responseData()
+  },
+  methods: {
+    responseData() {
+      // const token = localStorage.getItem('loginToken')
+      getNotesList()
+        .then((res) => {
+          this.totalNotes = res.data.data.data.reverse()
+          this.snackbarText = 'Get All Notes Successfully!!'
+          this.snackbar = true
+          console.log(this.totalNotes)
+        })
+        .catch((error) => {
+          this.snackbarText = 'Error in Axios req-res!!'
+          this.snackbar = true
+          console.log(error)
+        })
+    },
+    updateNotes() {
+      this.responseData()
+    },
+    filteredData(data) {
+      this.totalNotes = data
+    }
+  }
+}
+// call api
+// parent to child data sharing for display note
 </script>
 
 <template>
-  <CreateNote class="media" />
-  <DisplayNote />
+  <CreateNote class="media" @updateNotes="updateNotes" />
+  <DisplayNote :totalNotes="totalNotes" @updateData="filteredData" />
 </template>
 
 <style>
-@media screen and (max-width: 750px) {
+.media {
+  display: flex;
+  justify-content: center;
+  margin-left: 20%;
+}
+@media screen and (max-width: 800px) {
   .media {
-    width: 200px;
+    margin-left: -15%;
   }
 }
 </style>

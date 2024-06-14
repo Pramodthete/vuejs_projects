@@ -1,29 +1,33 @@
-import { postData } from '../services/axiosServices'
-import { getData } from '../services/axiosServices'
+import { postData, getData } from '../services/axiosServices'
 
 export const addNotes = (data, token) => {
-  let url = `notes/addNotes?access_token=${token}`
-  const headers = {
-    'Content-Type': 'application/json',
-    Authorization: token
+  let url = `notes/addNotes`
+  let headersOptions = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    }
   }
-  return postData(url, data, headers)
+  return postData(url, data, headersOptions)
 }
 
-export const getNotesList = (token) => {
-  let url = `notes/getNotesList?access_token=${token}`
-  const headers = {
-    'Content-Type': 'application/json',
-    Authorization: token
+export const getNotesList = () => {
+  const token = localStorage.getItem('loginToken')
+  let url = `notes/getNotesList`
+  let headersOptions = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    }
   }
-  return getData(url, headers)
+  return getData(url, headersOptions)
 }
 
-export const deleteNote = (id, token) => {
-  let url = `notes/removeNote/${id}?access_token=${token}`
+export const deleteNote = (data, token) => {
+  let url = `notes/trashNotes`
   const headers = {
     'Content-Type': 'application/json',
     Authorization: token
   }
-  return deleteData(url, headers)
+  return postData(url, data, { headers })
 }

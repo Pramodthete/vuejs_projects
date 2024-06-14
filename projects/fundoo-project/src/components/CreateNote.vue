@@ -1,25 +1,16 @@
 <script>
 import SnackBar from './SnackBar.vue'
 import IconButtons from './IconButtons.vue' // Correctly import IconButtons
+import { addNotes } from '@/services/noteServices'
 
 export default {
   components: {
     SnackBar,
-    IconButtons // Register IconButtons component
-  },
-  props: {
-    note: {
-      type: Object,
-      required: true
-    }
+    IconButtons
   },
   data: () => ({
     show1: false,
-    picker: null,
-    pickColor: false,
     menu: false,
-    file: null,
-    imageUrl: null,
     snackbar: false,
     snackbarText: '',
     title: '',
@@ -33,11 +24,32 @@ export default {
     oneIcon: { icon: 'mdi-pin-outline', action: () => console.log('Brush clicked') },
     twoIcon: { icon: 'mdi-pin', action: () => console.log('Brush clicked') }
   }),
+  emits: ['updateNotes'],
   methods: {
-    updateShow1(newValue) {
-      this.title = null
-      this.description = null
-      this.show1 = newValue
+    close() {
+      const token = localStorage.getItem('loginToken')
+      const data = { title: this.title, description: this.description }
+      console.log('---------------------->', token)
+      if (this.title != '' || this.description != '') {
+        addNotes(data, token)
+          .then((res) => {
+            this.snackbarText = 'Add Notes Successfully!!'
+            this.snackbar = true
+            console.log(res)
+            this.title = null
+            this.description = null
+            this.show1 = false
+            this.$emit('updateNotes')
+          })
+          .catch((error) => {
+            this.snackbarText = 'Something Went Wrong'
+            this.snackbar = true
+            console.log(error)
+          })
+      } else {
+        this.show1 = false
+        console.log('Both properties are null')
+      }
     }
   },
   computed: {
@@ -60,13 +72,17 @@ export default {
 </script>
 
 <template>
+  <SnackBar :snackbar.sync="snackbar" :text="snackbarText" @update:snackbar="snackbar = $event" />
   <div class="fit">
     <div class="inputs">
-      <v-text-field
+      <v-textarea
         class="inputBox"
         placeholder="Title"
         density="compact"
         variant="plain"
+        row-height="15"
+        auto-grow
+        rows="1"
         v-if="show1"
         v-model="title"
       >
@@ -78,7 +94,7 @@ export default {
             {{ twoIcon.icon }}
           </v-icon>
         </template>
-      </v-text-field>
+      </v-textarea>
       <v-textarea
         class="inputBox"
         placeholder="Take a Note ..."
@@ -95,21 +111,16 @@ export default {
             :class="['input-inner-icon', `icon-${index}`]"
             v-for="(item, index) in !show1 ? icons : ''"
             :key="index"
-            @click=""
           >
             {{ item.icon }}
           </v-icon>
         </template>
       </v-textarea>
-      <IconButtons
-        :show1="show1"
-        @update:show1="updateShow1"
-        :title="title"
-        :description="description"
-      />
-    </div>
-    <div>
-      <div class="d-flex justify-space-around" v-if="menu"></div>
+
+      <div style="display: flex; justify-content: space-between">
+        <IconButtons :show1="show1" />
+        <v-btn id="close" variant="text" v-if="show1" @click="close">Close</v-btn>
+      </div>
     </div>
   </div>
 </template>
@@ -122,7 +133,7 @@ export default {
 }
 .inputs {
   width: 100%;
-  min-width: 500px;
+  min-width: 400px;
   position: relative;
   height: fit-content;
   box-shadow: 0px 1px 4px 1px gray;
@@ -130,10 +141,15 @@ export default {
   padding: 1%;
   border-radius: 5px;
   padding-top: -4px;
+  margin-left: 200px;
 }
 
 .inputBox {
-  height: 33px;
+  height: 39px;
+  /* height: min-content; */
+}
+#close {
+  text-transform: capitalize;
 }
 
 :deep(.input-inner-icon) {

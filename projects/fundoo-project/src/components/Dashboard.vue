@@ -102,7 +102,6 @@ export default {
             :key="index"
             :title="item.title"
             :value="item.value"
-            :class="{ backgroundColor: back ? 'rgb(249, 231, 181)' : '' }"
           >
             <template v-slot:prepend>
               <v-icon :icon="item.icon" variant="text"></v-icon>
@@ -190,7 +189,7 @@ export default {
   border-radius: 12px;
 }
 .back-color :hover {
-  background-color: rgb(240, 238, 238);
+  background-color: rgb(249, 231, 181);
   border-radius: 12px;
 }
 
@@ -228,5 +227,24 @@ export default {
   margin: 8px;
   padding: 16px;
   width: 100%;
+}
+.v-app-bar.v-toolbar:not(.v-toolbar--flat) {
+  box-shadow: none;
+  border-bottom: 1px solid rgb(218, 217, 217);
+}
+.v-navigation-drawer--temporary.v-navigation-drawer--active {
+  box-shadow: none;
+}
+/* .v-list-item--one-line {
+  border: 1px solid black;
+  border-radius: 200px;
+} */
+/* .v-list-item--density-default:not(.v-list-item--nav) {
+  border: 1px solid black;
+  border-radius: 20px;
+} */
+.v-list-item::after {
+  border: 1px solid black;
+  border-radius: 20px;
 }
 </style>

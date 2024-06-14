@@ -7,7 +7,7 @@ import Hooks from '../views/HooksView.vue'
 import Dashboard from '../views/DashboardView.vue'
 import Demo from '@/views/DemoView.vue'
 import GetAllNotes from '@/components/GetAllNotes.vue'
-import IconButtons from '@/views/IconButtonsView.vue'
+import DialogBox from '@/views/DialogBoxView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,7 +23,7 @@ const router = createRouter({
       component: Dashboard,
       children: [
         {
-          path: '/dashboard/getAllNotes',
+          path: '/dashboard/notes',
           name: 'getAllNotes',
           component: GetAllNotes
         }
@@ -33,6 +33,11 @@ const router = createRouter({
       path: '/hooks',
       name: 'hooks',
       component: Hooks
+    },
+    {
+      path: '/d',
+      name: 'dialog',
+      component: DialogBox
     },
     {
       path: '/demo',

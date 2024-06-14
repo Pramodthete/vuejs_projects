@@ -1,6 +1,7 @@
 <script>
-import { addNotes } from '@/services/noteServices'
 import SnackBar from './SnackBar.vue'
+import { deleteNote } from '@/services/noteServices'
+
 export default {
   components: { SnackBar },
   props: {
@@ -8,21 +9,12 @@ export default {
       type: Boolean,
       default: false
     },
-    componentKey: {
-      type: Number,
-      default: 0
-    },
-    open: {
-      type: Boolean,
-      default: false
-    },
-    title: {
+    hoverIndex: {
       type: String,
-      default: ''
+      default: null
     },
-    description: {
-      type: String,
-      default: ''
+    totalNotes: {
+      type: Array
     }
   },
   data: () => ({
@@ -35,7 +27,7 @@ export default {
     snackbarText: '',
     pin: false,
     reminders: [
-      { title: 'Tommarow', time: '8:00 PM', icon: '', c: false },
+      { title: 'Tomorrow', time: '8:00 PM', icon: '', c: false },
       { title: 'Next week', time: 'Mon, 8:00 PM', icon: '', c: false },
       { title: 'Home', time: 'Pune', icon: '', c: false },
       { title: 'Work', time: 'Govandi, Mumbai', icon: '', c: false },
@@ -43,45 +35,47 @@ export default {
       { title: 'Pick a place', time: '', icon: 'mdi-map-marker', c: true }
     ],
     notesOptions: [
-      { title: 'Delete Note', action: () => console.log('clicked') },
-      { title: 'Add Label', action: () => console.log('clicked') },
-      { title: 'Add Drawing', action: () => console.log('clicked') },
-      { title: 'Make a copy', action: () => console.log('clicked') },
-      { title: 'Show Checkboxes', action: () => console.log('clicked') },
-      { title: 'Copy to google docs', action: () => console.log('clicked') },
-      { title: 'Version history', action: () => console.log('clicked') }
+      { title: 'Delete Note' },
+      { title: 'Add Label' },
+      { title: 'Add Drawing' },
+      { title: 'Make a copy' },
+      { title: 'Show Checkboxes' },
+      { title: 'Copy to Google Docs' },
+      { title: 'Version history' }
     ]
   }),
+  emits: ['updateNotes'],
   methods: {
     handleClick() {
       console.log('Icon button clicked')
     },
-    close() {
-      const token = localStorage.getItem('loginToken')
-      const data = { title: this.title, description: this.description }
-
-      addNotes(data, token)
-        .then((res) => {
-          this.snackbarText = 'Add Notes Successfully!!'
-          this.snackbar = true
-          // this.title = null
-          // this.description = null
-          this.componentKey++
-          console.log(res)
-        })
-        .catch((error) => {
-          this.snackbarText = 'Error in Axios req-res!!'
-          this.snackbar = true
-          console.log(error)
-        })
-
-      this.$emit('update:show1', false)
-    },
     snackMsg() {
-      this.snackbarText = 'note archieved'
+      this.snackbarText = 'note archived'
       this.snackbar = true
+    },
+    menus(title) {
+      if (title === 'Delete Note') {
+        const token = localStorage.getItem('loginToken')
+        const data = { noteIdList: [this.hoverIndex], isDeleted: true }
+        console.log('Data being sent to deleteNote:', data)
+
+        deleteNote(data, token)
+          .then((response) => {
+            if (response.data.data.success === true) {
+              const filteredData = this.totalNotes.filter((note) => note.id !== this.hoverIndex)
+              console.log('Filtered data:', filteredData)
+              this.$emit('updateNotes', filteredData)
+            } else {
+              console.warn('Unexpected response:', response)
+            }
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      } else {
+        console.log('-----------> select correct option')
+      }
     }
-    // deleteNote(id,token)
   }
 }
 </script>
@@ -94,7 +88,7 @@ export default {
         <v-menu class="flex">
           <template v-slot:activator="{ props }">
             <v-btn
-              style="font-size: smaller; margin-left: 5px"
+              style="font-size: smaller; margin-left: -1px"
               @click="menu = !menu"
               icon="mdi-bell-plus-outline"
               variant="text"
@@ -105,10 +99,10 @@ export default {
           <v-list>
             <label style="margin-left: 5%" for="Reminder">Reminder:</label>
             <v-list-item
-              style="width: 300px; font-size: smaller; margin-left: 5px"
-              v-for="(item, index) in reminders"
-              :key="index"
-              :value="index"
+              style="width: 300px; font-size: smaller; margin-left: -1px"
+              v-for="item in reminders"
+              :key="item.id"
+              :value="item.id"
             >
               <v-list-item-title class="font-menu">
                 <v-icon v-show="item.c"> {{ item.icon + ' ' }} </v-icon>{{ ' ' + item.title }}
@@ -118,12 +112,12 @@ export default {
           </v-list>
         </v-menu>
         <v-btn
-          style="font-size: smaller; margin-left: 5px"
+          style="font-size: smaller; margin-left: -1px"
           icon="mdi-account-plus"
           variant="text"
         ></v-btn>
         <v-btn
-          style="font-size: smaller; margin-left: 5px"
+          style="font-size: smaller; margin-left: -1px"
           icon="mdi-palette-outline"
           variant="text"
           ><v-icon @click="pickColor = !pickColor">mdi-palette-outline</v-icon>
@@ -131,18 +125,21 @@ export default {
             <v-color-picker v-model="picker"></v-color-picker>
           </div>
         </v-btn>
-        <v-btn style="font-size: smaller; margin-left: 5px" icon="mdi-image-outline" variant="text">
+        <v-btn
+          style="font-size: smaller; margin-left: -1px"
+          icon="mdi-image-outline"
+          variant="text"
+        >
           <v-file-input
             v-model="file"
             label="Upload Image"
             prepend-icon="mdi-image-outline"
             accept="image/*"
-            @change="previewImage"
             hide-input
           ></v-file-input>
         </v-btn>
         <v-btn
-          style="font-size: smaller; margin-left: 5px"
+          style="font-size: smaller; margin-left: -1px"
           @click="snackMsg"
           icon="mdi-archive-arrow-down-outline"
           variant="text"
@@ -150,8 +147,7 @@ export default {
         <v-menu>
           <template v-slot:activator="{ props }">
             <v-btn
-              class="bell-plus"
-              style="font-size: smaller; margin-left: 5px"
+              style="font-size: smaller; margin-left: -1px"
               @click="menu = !menu"
               icon="mdi-dots-vertical"
               variant="text"
@@ -161,21 +157,16 @@ export default {
           </template>
           <v-list>
             <v-list-item
-              style="width: 200px; font-size: smaller; margin-left: 5px"
+              style="width: 200px"
               v-for="(item, index) in notesOptions"
               :key="index"
               :value="index"
+              @click="menus(item.title)"
             >
-              <v-list-item-title class="font-menu">
-                <v-icon v-show="item.c"> {{ item.icon + ' ' }} </v-icon>{{ ' ' + item.title }}
-                <p style="float: right; font-size: smaller">{{ item.time }}</p></v-list-item-title
-              >
+              {{ ' ' + item.title }}
             </v-list-item>
           </v-list>
         </v-menu>
-      </div>
-      <div>
-        <v-btn id="close" variant="text" v-if="show1" @click="close">Close</v-btn>
       </div>
     </div>
   </div>
@@ -190,10 +181,13 @@ export default {
   display: flex;
   justify-content: space-between;
   color: rgb(71, 70, 70);
+  position: static;
 }
+
 .font {
   font-size: x-small;
 }
+
 .innerBet {
   display: flex;
   flex-direction: row;
