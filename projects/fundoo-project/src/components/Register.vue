@@ -230,7 +230,7 @@ export default {
                   </div>
                   <div>
                     <v-btn id="btn-s" :disabled="!isFormValid" density="default" type="submit"
-                      >Submit</v-btn
+                      >Sign up</v-btn
                     >
                   </div>
                 </div>
@@ -359,6 +359,7 @@ input {
 #btn-s {
   background-color: rgb(92, 108, 251);
   color: white;
+  text-transform: capitalize;
 }
 .foot {
   display: flex;

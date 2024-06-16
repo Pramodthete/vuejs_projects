@@ -1,6 +1,6 @@
 <script>
 import SnackBar from './SnackBar.vue'
-import IconButtons from './IconButtons.vue' // Correctly import IconButtons
+import IconButtons from './IconButtons.vue'
 import { addNotes } from '@/services/noteServices'
 
 export default {
@@ -29,7 +29,7 @@ export default {
     close() {
       const token = localStorage.getItem('loginToken')
       const data = { title: this.title, description: this.description }
-      console.log('---------------------->', token)
+      console.log('---------------------->', this.title, this.description)
       if (this.title != '' || this.description != '') {
         addNotes(data, token)
           .then((res) => {
@@ -51,6 +51,9 @@ export default {
         console.log('Both properties are null')
       }
     }
+  },
+  mounted() {
+    document.addEventListener('click', this.handleClickOutside)
   },
   computed: {
     form() {
@@ -130,24 +133,37 @@ export default {
   width: fit-content;
   padding-left: 0%;
   padding-top: 2%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 .inputs {
-  width: 100%;
-  min-width: 400px;
+  max-width: 600px;
+  min-width: 500px;
   position: relative;
   height: fit-content;
-  box-shadow: 0px 1px 4px 1px gray;
+  box-shadow: 0px 2px 5px 0px rgb(180, 179, 179);
   background-color: white;
-  padding: 1%;
+  padding: 0%;
   border-radius: 5px;
   padding-top: -4px;
-  margin-left: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .inputBox {
-  height: 39px;
+  height: fit-content;
+  padding-bottom: 2%;
+  margin-left: 3%;
+  padding-right: 2%;
   /* height: min-content; */
 }
+.inputBox::-webkit-input-placeholder {
+  color: blue;
+  font-weight: bold;
+}
+
 #close {
   text-transform: capitalize;
 }
@@ -155,5 +171,17 @@ export default {
 :deep(.input-inner-icon) {
   cursor: pointer;
   margin-left: 30px;
+}
+.v-input__control {
+  padding-bottom: 10px;
+}
+.v-input--plain-underlined.v-text-field.v-input__details {
+  display: none;
+}
+
+@media screen and (max-width: 600px) {
+  .inputs {
+    width: fit-content;
+  }
 }
 </style>

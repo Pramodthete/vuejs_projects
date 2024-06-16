@@ -44,7 +44,7 @@ export default {
       { title: 'Version history' }
     ]
   }),
-  emits: ['updateNotes'],
+  // emits: ['menuStateChanged', 'updateNotes'],
   methods: {
     handleClick() {
       console.log('Icon button clicked')
@@ -75,6 +75,11 @@ export default {
       } else {
         console.log('-----------> select correct option')
       }
+    },
+    toggleMenu(event) {
+      this.menu = !this.menu
+      this.$emit('menuStateChanged', this.menu)
+      event.stopPropagation()
     }
   }
 }
@@ -88,18 +93,19 @@ export default {
         <v-menu class="flex">
           <template v-slot:activator="{ props }">
             <v-btn
-              style="font-size: smaller; margin-left: -1px"
+              style="font-size: smaller; margin-left: -8px"
               @click="menu = !menu"
               icon="mdi-bell-plus-outline"
               variant="text"
               v-bind="props"
+              @click.stop="toggleMenu"
             >
             </v-btn>
           </template>
           <v-list>
             <label style="margin-left: 5%" for="Reminder">Reminder:</label>
             <v-list-item
-              style="width: 300px; font-size: smaller; margin-left: -1px"
+              style="width: 300px; font-size: smaller; margin-left: -8px"
               v-for="item in reminders"
               :key="item.id"
               :value="item.id"
@@ -112,12 +118,12 @@ export default {
           </v-list>
         </v-menu>
         <v-btn
-          style="font-size: smaller; margin-left: -1px"
+          style="font-size: smaller; margin-left: -8px"
           icon="mdi-account-plus"
           variant="text"
         ></v-btn>
         <v-btn
-          style="font-size: smaller; margin-left: -1px"
+          style="font-size: smaller; margin-left: -8px"
           icon="mdi-palette-outline"
           variant="text"
           ><v-icon @click="pickColor = !pickColor">mdi-palette-outline</v-icon>
@@ -126,7 +132,7 @@ export default {
           </div>
         </v-btn>
         <v-btn
-          style="font-size: smaller; margin-left: -1px"
+          style="font-size: smaller; margin-left: -8px"
           icon="mdi-image-outline"
           variant="text"
         >
@@ -139,7 +145,7 @@ export default {
           ></v-file-input>
         </v-btn>
         <v-btn
-          style="font-size: smaller; margin-left: -1px"
+          style="font-size: smaller; margin-left: -8px"
           @click="snackMsg"
           icon="mdi-archive-arrow-down-outline"
           variant="text"
@@ -147,11 +153,11 @@ export default {
         <v-menu>
           <template v-slot:activator="{ props }">
             <v-btn
-              style="font-size: smaller; margin-left: -1px"
-              @click="menu = !menu"
+              style="font-size: smaller; margin-left: -8px"
               icon="mdi-dots-vertical"
               variant="text"
               v-bind="props"
+              @click.stop="toggleMenu"
             >
             </v-btn>
           </template>
@@ -161,9 +167,10 @@ export default {
               v-for="(item, index) in notesOptions"
               :key="index"
               :value="index"
+              @click.stop
               @click="menus(item.title)"
             >
-              {{ ' ' + item.title }}
+              {{ item.title }}
             </v-list-item>
           </v-list>
         </v-menu>
@@ -185,17 +192,18 @@ export default {
 }
 
 .font {
-  font-size: x-small;
+  font-size: xx-small;
 }
 
 .innerBet {
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: left;
+  margin-left: -3px;
 }
 
 .pick {
-  position: absolute;
+  position: inherit;
   background-color: white;
   border-radius: 50%;
   z-index: 1;

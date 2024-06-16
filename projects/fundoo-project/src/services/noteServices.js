@@ -1,4 +1,5 @@
 import { postData, getData } from '../services/axiosServices'
+const token = localStorage.getItem('loginToken')
 
 export const addNotes = (data, token) => {
   let url = `notes/addNotes`
@@ -12,7 +13,6 @@ export const addNotes = (data, token) => {
 }
 
 export const getNotesList = () => {
-  const token = localStorage.getItem('loginToken')
   let url = `notes/getNotesList`
   let headersOptions = {
     headers: {

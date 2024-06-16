@@ -1,16 +1,11 @@
 <script>
-import DisplayNote from './DisplayNote.vue'
-
 export default {
-  components: {
-    DisplayNote
-  },
-  emits: ['showCard'],
   data: () => ({
     dialog: false
   }),
   methods: {
     showCard(id) {
+      this.dialog = true
       console.log('here====================>', id)
     }
   }
@@ -18,6 +13,7 @@ export default {
 </script>
 
 <template>
+  <SnackBar :snackbar.sync="snackbar" :text="snackbarText" @update:snackbar="snackbar = $event" />
   <div class="pa-4 text-center">
     <v-dialog v-model="dialog" max-width="600">
       <template v-slot:activator="{ props: activatorProps }">
@@ -30,19 +26,10 @@ export default {
         ></v-btn>
       </template>
 
-      <v-card prepend-icon="mdi-account" title="User Profile">
-        <v-card-text>
-          <DisplayNote @dialogbox="showCard" />
-        </v-card-text>
-
-        <v-divider></v-divider>
-
+      <v-card>
+        <DisplayNote />
         <v-card-actions>
-          <v-spacer></v-spacer>
-
           <v-btn text="Close" variant="plain" @click="dialog = false"></v-btn>
-
-          <v-btn color="primary" text="Save" variant="tonal" @click="dialog = false"></v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

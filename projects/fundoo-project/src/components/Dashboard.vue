@@ -30,11 +30,14 @@ export default {
     onflexNotes() {
       this.flex = !this.flex
       console.log(this.flex)
-    }
-  },
+    },
+    changeColor(index) {
+      var button = document.getElementById(index)
 
-  watch: {
-    group() {}
+      button.addEventListener('click', function () {
+        button.classList.add('back-color')
+      })
+    }
   }
 }
 </script>
@@ -102,6 +105,7 @@ export default {
             :key="index"
             :title="item.title"
             :value="item.value"
+            @click="changeColor(index)"
           >
             <template v-slot:prepend>
               <v-icon :icon="item.icon" variant="text"></v-icon>
@@ -127,7 +131,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  margin-left: 100px;
+  /* margin-left: 100px; */
 }
 .drawer-open {
   margin-left: 230px;
@@ -138,12 +142,14 @@ export default {
 }
 .v-card--variant-elevated {
   box-shadow: none;
+  border: none !important;
   display: flex;
   justify-content: end;
-  margin-top: 30px;
+  margin-top: 5px;
   margin-left: 20px;
   position: relative;
   background-color: transparent;
+  padding-left: 20px;
 }
 
 .v-input__control {
@@ -157,6 +163,9 @@ export default {
   .noteinput {
     /* margin-right: 200px; */
     margin-left: 0px;
+  }
+  .search {
+    width: 50px;
   }
 }
 
@@ -180,17 +189,20 @@ export default {
 .btn-avatar {
   color: gray;
 }
-.back-color :active {
-  background-color: rgb(249, 231, 181);
-  border-radius: 12px;
+.back-color {
+  background-color: #feefc3;
+  border-top-right-radius: 30px !important;
+  border-bottom-right-radius: 30px !important;
 }
 .back-color :focus {
-  background-color: rgb(249, 231, 181);
-  border-radius: 12px;
+  background-color: #feefc3;
+  border-top-right-radius: 30px !important;
+  border-bottom-right-radius: 30px !important;
 }
 .back-color :hover {
-  background-color: rgb(249, 231, 181);
-  border-radius: 12px;
+  background-color: rgb(249, 247, 242);
+  border-top-right-radius: 30px !important;
+  border-bottom-right-radius: 30px !important;
 }
 
 #close {
@@ -243,8 +255,24 @@ export default {
   border: 1px solid black;
   border-radius: 20px;
 } */
-.v-list-item::after {
+/* .v-list-item::after {
   border: 1px solid black;
   border-radius: 20px;
+} */
+details,
+main {
+  margin-left: 10px;
+  display: block;
+  margin-top: 60px;
+  width: 1300px;
+}
+.v-input__control {
+  padding-bottom: 10px;
+}
+.v-input--plain-underlined.v-text-field.v-input__details {
+  display: none;
+}
+.v-messages {
+  display: none;
 }
 </style>

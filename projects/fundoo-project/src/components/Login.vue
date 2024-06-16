@@ -180,6 +180,7 @@ export default {
   border: 1px solid rgb(206, 205, 205);
   background-color: white;
   width: fit-content;
+  margin-top: -50px;
 }
 .innerDiv {
   padding: 2%;

@@ -15,7 +15,6 @@ export default {
   },
   methods: {
     responseData() {
-      // const token = localStorage.getItem('loginToken')
       getNotesList()
         .then((res) => {
           this.totalNotes = res.data.data.data.reverse()
@@ -42,12 +41,12 @@ export default {
 </script>
 
 <template>
-  <CreateNote class="media" @updateNotes="updateNotes" />
+  <CreateNote @updateNotes="updateNotes" />
   <DisplayNote :totalNotes="totalNotes" @updateData="filteredData" />
 </template>
 
 <style>
-.media {
+/* .media {
   display: flex;
   justify-content: center;
   margin-left: 20%;
@@ -56,5 +55,5 @@ export default {
   .media {
     margin-left: -15%;
   }
-}
+} */
 </style>
