@@ -15,9 +15,12 @@ export default {
     snackbarText: '',
     pin: true,
     hoverIndex: null,
+    updatedColor: '#FFFFFF',
+    clickedIndex: null,
     componentKey: 0,
     menuCard: null,
     localDialog: false,
+    commonNotes: [],
     note: {},
     description: '',
     oneIcon: { icon: 'mdi-pin-outline', action: () => console.log('Pin-outline clicked') },
@@ -48,6 +51,17 @@ export default {
     closeDialog(data) {
       this.localDialog = false
       console.log(data)
+    },
+    onclickCheck(id) {
+      console.log(id)
+      this.clickedIndex = id
+    },
+    updateColor(item) {
+      console.log(item.noteIdList[0])
+      console.log(this.clickedIndex)
+      this.clickedIndex = item.noteIdList[0]
+      this.updatedColor = item.color
+      this.$emit('updateData')
     }
   }
 }
@@ -66,21 +80,27 @@ export default {
           @mouseleave="hoverIndex = null"
           outlined
           hover
+          :style="{ backgroundColor: item.color }"
+          :class="{ check: clickedIndex === hoverIndex }"
         >
           <div class="pin-icon">
             <v-icon v-if="hoverIndex === item.id || menuCard === item.id">
               {{ oneIcon.icon + ' ' }}
             </v-icon>
           </div>
+          <div class="check-card">
+            <v-icon
+              v-if="hoverIndex === item.id || menuCard === item.id"
+              @click="onclickCheck(item.id)"
+            >
+              mdi-check-circle
+            </v-icon>
+          </div>
           <div v-bind="activatorProps" @click="openDialog(item)">
             <div>
               <v-card-text class="title"> {{ item.title }} </v-card-text>
             </div>
-            <div class="check-card">
-              <v-icon v-if="hoverIndex === item.id || menuCard === item.id">
-                mdi-check-circle
-              </v-icon>
-            </div>
+
             <v-card-text>{{ item.description }}</v-card-text>
           </div>
 
@@ -88,6 +108,7 @@ export default {
             <IconButtons
               @menuStateChanged="changeState(item.id, $event)"
               @updateNotes="updateNotes"
+              @updateColor="updateColor"
               :show1="true"
               :hoverIndex="item.id"
               :totalNotes="this.totalNotes"
@@ -150,6 +171,9 @@ export default {
   z-index: 1;
   overflow: visible;
 }
+.check {
+  border: 3px solid black !important;
+}
 
 .icon-buttons {
   display: none;
@@ -168,9 +192,9 @@ export default {
 /* 
 .note-card:hover .icon-buttons {
   display: inline;
-}
-.note-card:hover {
-  box-shadow: 1px 3px 10px rgb(223, 221, 221);
+}*/
+/* .note-card:hover {
+  box-shadow: 0px 1px 5px 0px rgb(144, 144, 144);
 } */
 
 .flex {
@@ -193,6 +217,8 @@ export default {
 }
 .v-card--variant-elevated {
   box-shadow: none !important;
+  margin-left: 0px !important;
+  padding-left: 0px !important;
   border: 1px solid rgb(206, 206, 206) !important;
 }
 .v-card .v-card-text {

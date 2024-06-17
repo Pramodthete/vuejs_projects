@@ -2,9 +2,20 @@
 import CreateNote from './CreateNote.vue'
 import DisplayNote from './DisplayNote.vue'
 import { getNotesList } from '@/services/noteServices'
+
 export default {
+  props: {
+    trashNotes: Array,
+    flag: Object
+  },
   data: () => ({
-    totalNotes: []
+    deletedNotes: [],
+    archivedNotes: [],
+    pinnedNotes: [],
+    totalNotes: [],
+    notes: [],
+    snackbar: false,
+    snackbarText: ''
   }),
   components: {
     CreateNote,
@@ -17,32 +28,43 @@ export default {
     responseData() {
       getNotesList()
         .then((res) => {
-          this.totalNotes = res.data.data.data.reverse()
-          this.snackbarText = 'Get All Notes Successfully!!'
+          this.notes = res.data.data.data
+
+          // this.deletedNotes = this.notes.filter((note) => note.isDeleted)
+          // this.archivedNotes = this.notes.filter((note) => note.isArchived)
+          // this.pinnedNotes = this.notes.filter((note) => note.isPined)
+          this.totalNotes = this.notes.filter(
+            (note) => !note.isDeleted && !note.isArchived && !note.isPined
+          )
+          this.snackbarText = 'Fetched All Notes Successfully!!'
           this.snackbar = true
           console.log(this.totalNotes)
         })
         .catch((error) => {
-          this.snackbarText = 'Error in Axios req-res!!'
+          console.log('Error:', error)
+          this.snackbarText = 'Error in Axios request/response!!'
           this.snackbar = true
-          console.log(error)
         })
     },
     updateNotes() {
       this.responseData()
     },
-    filteredData(data) {
-      this.totalNotes = data
+    filteredData() {
+      this.responseData()
     }
   }
 }
-// call api
-// parent to child data sharing for display note
 </script>
 
 <template>
   <CreateNote @updateNotes="updateNotes" />
-  <DisplayNote :totalNotes="totalNotes" @updateData="filteredData" @updateNotes="updateNotes" />
+  <DisplayNote
+    :totalNotes="totalNotes"
+    :deletedNotes="trashNotes"
+    :flag="flag"
+    @updateData="filteredData"
+    @updateNotes="updateNotes"
+  />
 </template>
 
 <style scoped>

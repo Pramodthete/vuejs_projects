@@ -8,6 +8,8 @@ import Dashboard from '../views/DashboardView.vue'
 import Demo from '@/views/DemoView.vue'
 import GetAllNotes from '@/components/GetAllNotes.vue'
 import DialogBox from '@/views/DialogBoxView.vue'
+import GetAllTrashNotes from '@/views/GetAllTrashNotesView.vue'
+import GetAllArchivedNotes from '@/views/GetAllArchivedNotesView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +28,16 @@ const router = createRouter({
           path: '/dashboard/notes',
           name: 'getAllNotes',
           component: GetAllNotes
+        },
+        {
+          path: '/dashboard/trashNotes',
+          name: 'getAllTrashNotes',
+          component: GetAllTrashNotes
+        },
+        {
+          path: '/dashboard/archivedNotes',
+          name: 'getAllArchivedNotes',
+          component: GetAllArchivedNotes
         }
       ]
     },

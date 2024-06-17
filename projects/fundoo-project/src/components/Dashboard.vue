@@ -14,6 +14,8 @@ export default {
     flex: false,
     back: true,
     selectedIndex: 0,
+    trashNotes: [],
+    flag: { name: '', noteFlag: false },
     items: [
       { title: 'Notes', value: 'notes', icon: 'mdi-lightbulb-outline' },
       { title: 'Reminders', value: 'reminders', icon: 'mdi-bell-outline' },
@@ -27,13 +29,21 @@ export default {
       this.openRail = !this.openRail
       // @click.stop="drawer = !drawer"
     },
-
+    dataChange(item, index) {
+      this.selectedIndex = index
+      if (item === 'trash') {
+        this.$router.push({ name: 'getAllTrashNotes' })
+      } else if (item === 'notes') {
+        this.$router.push({ name: 'getAllNotes' })
+      } else if (item === 'archived') {
+        this.$router.push({ name: 'getAllArchivedNotes' })
+      } else {
+        console.log('else')
+      }
+    },
     onflexNotes() {
       this.flex = !this.flex
       console.log(this.flex)
-    },
-    changeColor(index) {
-      this.selectedIndex = index
     }
   }
 }
@@ -104,7 +114,7 @@ export default {
             :title="item.title"
             :value="item.value"
             :class="{ 'active-item': selectedIndex === index }"
-            @click="changeColor(index)"
+            @click="dataChange(item.value, index)"
           >
             <template v-slot:prepend>
               <v-icon :icon="item.icon" variant="text"></v-icon>
@@ -114,18 +124,12 @@ export default {
       </v-navigation-drawer>
     </v-layout>
     <div class="default" :class="{ 'drawer-open noteinput': !openRail }">
-      <!-- <CreateNote :class="{ noteinput: openRail }" />
-      <DisplayNote :style="{ display: flex ? 'inline' : 'flex' }" /> -->
-      <RouterView />
+      <RouterView :trashNotes="trashNotes" :flag="flag" />
     </div>
   </v-card>
 </template>
 
 <style scoped>
-/* .all {
-  color: gray;
-} */
-
 .default {
   display: flex;
   flex-direction: column;

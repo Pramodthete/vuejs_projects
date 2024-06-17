@@ -1,6 +1,6 @@
 <script>
 import SnackBar from './SnackBar.vue'
-import { deleteNote } from '@/services/noteServices'
+import { updateArchivedNotes, updateColorNotes } from '@/services/noteServices'
 
 export default {
   components: { SnackBar },
@@ -18,8 +18,7 @@ export default {
     }
   },
   data: () => ({
-    picker: null,
-    pickColor: false,
+    pick: false,
     menu: false,
     file: null,
     imageUrl: null,
@@ -35,17 +34,17 @@ export default {
       { title: 'Pick a place', time: '', icon: 'mdi-map-marker', c: true }
     ],
     colors: [
-      { name: '#F48FB1', time: '' },
-      { name: '#A5D6A7', time: '' },
-      { name: '#EF9A9A', time: '' },
-      { name: '#B0BEC5', time: '' },
-      { name: '#FFF59D', time: '' },
-      { name: '#C5E1A5', time: '' },
-      { name: '#80DEEA', time: '' },
-      { name: '#E1BEE7', time: '' },
-      { name: '#FFCDD2', time: '' },
-      { name: '#F9FBE7', time: '' },
-      { name: '#FAFAFA', time: '' }
+      { name: 'Coral', color: '#F48FB1' },
+      { name: 'Mint', color: '#A5D6A7' },
+      { name: 'Peach', color: '#EF9A9A' },
+      { name: 'Sage', color: '#B0BEC5' },
+      { name: 'Sand', color: '#FFF59D' },
+      { name: 'Fog', color: '#C5E1A5' },
+      { name: 'Storm', color: '#80DEEA' },
+      { name: 'Dusk', color: '#E1BEE7' },
+      { name: 'Blossum', color: '#FFCDD2' },
+      { name: 'Clay', color: '#F9FBE7' },
+      { name: 'Chalk', color: '#FAFAFA' }
     ],
     notesOptions: [
       { title: 'Delete Note' },
@@ -59,12 +58,37 @@ export default {
   }),
   emits: ['menuStateChanged', 'updateNotes'],
   methods: {
-    handleClick() {
-      console.log('Icon button clicked')
+    changeColor(color) {
+      const data = { noteIdList: [this.$props.hoverIndex], color: color.color }
+      this.pick = false
+      updateColorNotes(data)
+        .then((res) => {
+          this.$emit('updateColor', data)
+          this.snackbarText = 'Color Aplied to the card'
+          this.snackbar = true
+          console.log(res)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     },
-    snackMsg() {
-      this.snackbarText = 'note archived'
-      this.snackbar = true
+    moveToArchived() {
+      const data = {
+        noteIdList: [this.$props.hoverIndex],
+        isArchived: true
+      }
+      updateArchivedNotes(data)
+        .then((res) => {
+          console.log(res)
+          this.snackbarText = 'note archived'
+          this.snackbar = true
+          this.$emit('updateNotes')
+        })
+        .catch((error) => {
+          this.snackbarText = 'Error in archived'
+          this.snackbar = true
+          console.log(error)
+        })
     },
     menus(title) {
       if (title === 'Delete Note') {
@@ -74,9 +98,7 @@ export default {
         deleteNote(data)
           .then((response) => {
             if (response.data.data.success === true) {
-              const filteredData = this.totalNotes.filter((note) => note.id !== this.hoverIndex)
-              console.log('Filtered data:', filteredData)
-              this.$emit('updateNotes', filteredData)
+              this.$emit('updateNotes', response)
             } else {
               console.warn('Unexpected response:', response)
             }
@@ -134,15 +156,36 @@ export default {
           icon="mdi-account-plus"
           variant="text"
         ></v-btn>
-        <v-btn
-          style="font-size: smaller; margin-left: -8px"
-          icon="mdi-palette-outline"
-          variant="text"
-          ><v-icon @click="pickColor = !pickColor">mdi-palette-outline</v-icon>
-          <div class="pick" v-if="pickColor">
-            <v-color-picker v-model="picker"></v-color-picker>
-          </div>
-        </v-btn>
+        <v-menu>
+          <template v-slot:activator="{ props }">
+            <v-btn
+              style="font-size: smaller; margin-left: -8px"
+              icon="mdi-palette-outline"
+              variant="text"
+              v-bind="props"
+            >
+            </v-btn>
+          </template>
+          <v-list style="margin-left: 40px; display: flex">
+            <v-list-item
+              style="display: flex; justify-content: space-evenly; flex-direction: column"
+              v-for="color in colors"
+              :key="color.name"
+              :value="color.color"
+            >
+              <div
+                :style="{
+                  backgroundColor: color.color,
+                  width: '30px',
+                  height: '30px',
+                  borderRadius: '50%'
+                }"
+                v-show="!pick"
+                @click.stop="changeColor(color)"
+              ></div>
+            </v-list-item>
+          </v-list>
+        </v-menu>
         <v-btn
           style="font-size: smaller; margin-left: -8px"
           icon="mdi-image-outline"
@@ -158,7 +201,7 @@ export default {
         </v-btn>
         <v-btn
           style="font-size: smaller; margin-left: -8px"
-          @click="snackMsg"
+          @click="moveToArchived"
           icon="mdi-archive-arrow-down-outline"
           variant="text"
         ></v-btn>

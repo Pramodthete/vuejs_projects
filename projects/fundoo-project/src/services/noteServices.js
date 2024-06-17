@@ -40,3 +40,39 @@ export const updateNotes = (data) => {
   }
   return postData(url, data, { headers })
 }
+
+export const updateArchivedNotes = (data) => {
+  let url = `notes/archiveNotes`
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: token
+  }
+  return postData(url, data, { headers })
+}
+
+export const updateColorNotes = (data) => {
+  let url = `notes/changesColorNotes`
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: token
+  }
+  return postData(url, data, { headers })
+}
+
+export const getTrashNotes = () => {
+  let url = `notes/getTrashNotesList`
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: token
+  }
+  return getData(url, { headers })
+}
+
+export const getArchivedNotes = () => {
+  let url = `notes/getArchiveNotesList`
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: token
+  }
+  return getData(url, { headers })
+}

@@ -127,7 +127,7 @@ export default {
   </div>
 </template>
 
-<style scoped>
+<style>
 .fit {
   width: fit-content;
   padding-left: 0%;
@@ -141,7 +141,7 @@ export default {
   min-width: 500px;
   position: relative;
   height: fit-content;
-  box-shadow: 0px 2px 5px 0px rgb(180, 179, 179);
+  box-shadow: 0px 1px 5px 0px rgb(144, 144, 144);
   background-color: white;
   padding: 0%;
   border-radius: 5px;
@@ -153,7 +153,7 @@ export default {
 
 .inputBox {
   height: fit-content;
-  padding-bottom: 2%;
+  /* padding-bottom: 2%; */
   margin-left: 3%;
   padding-right: 2%;
   white-space: pre-wrap;
