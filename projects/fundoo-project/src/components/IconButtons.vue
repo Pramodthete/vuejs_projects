@@ -34,6 +34,19 @@ export default {
       { title: 'Pick a date & time', time: '', icon: 'mdi-clock-outline', c: true },
       { title: 'Pick a place', time: '', icon: 'mdi-map-marker', c: true }
     ],
+    colors: [
+      { name: '#F48FB1', time: '' },
+      { name: '#A5D6A7', time: '' },
+      { name: '#EF9A9A', time: '' },
+      { name: '#B0BEC5', time: '' },
+      { name: '#FFF59D', time: '' },
+      { name: '#C5E1A5', time: '' },
+      { name: '#80DEEA', time: '' },
+      { name: '#E1BEE7', time: '' },
+      { name: '#FFCDD2', time: '' },
+      { name: '#F9FBE7', time: '' },
+      { name: '#FAFAFA', time: '' }
+    ],
     notesOptions: [
       { title: 'Delete Note' },
       { title: 'Add Label' },
@@ -44,7 +57,7 @@ export default {
       { title: 'Version history' }
     ]
   }),
-  // emits: ['menuStateChanged', 'updateNotes'],
+  emits: ['menuStateChanged', 'updateNotes'],
   methods: {
     handleClick() {
       console.log('Icon button clicked')
@@ -55,11 +68,10 @@ export default {
     },
     menus(title) {
       if (title === 'Delete Note') {
-        const token = localStorage.getItem('loginToken')
         const data = { noteIdList: [this.hoverIndex], isDeleted: true }
         console.log('Data being sent to deleteNote:', data)
 
-        deleteNote(data, token)
+        deleteNote(data)
           .then((response) => {
             if (response.data.data.success === true) {
               const filteredData = this.totalNotes.filter((note) => note.id !== this.hoverIndex)
@@ -179,7 +191,7 @@ export default {
   </div>
 </template>
 
-<style>
+<style scoped>
 #close {
   text-transform: capitalize;
 }

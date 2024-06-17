@@ -13,6 +13,7 @@ export default {
     snackbarText: '',
     flex: false,
     back: true,
+    selectedIndex: 0,
     items: [
       { title: 'Notes', value: 'notes', icon: 'mdi-lightbulb-outline' },
       { title: 'Reminders', value: 'reminders', icon: 'mdi-bell-outline' },
@@ -32,11 +33,7 @@ export default {
       console.log(this.flex)
     },
     changeColor(index) {
-      var button = document.getElementById(index)
-
-      button.addEventListener('click', function () {
-        button.classList.add('back-color')
-      })
+      this.selectedIndex = index
     }
   }
 }
@@ -100,11 +97,13 @@ export default {
       >
         <v-list class="back-color">
           <v-list-item
+            class="back-color"
             v-for="(item, index) in items"
             :id="index"
             :key="index"
             :title="item.title"
             :value="item.value"
+            :class="{ 'active-item': selectedIndex === index }"
             @click="changeColor(index)"
           >
             <template v-slot:prepend>
@@ -189,18 +188,8 @@ export default {
 .btn-avatar {
   color: gray;
 }
-.back-color {
-  background-color: #feefc3;
-  border-top-right-radius: 30px !important;
-  border-bottom-right-radius: 30px !important;
-}
-.back-color :focus {
-  background-color: #feefc3;
-  border-top-right-radius: 30px !important;
-  border-bottom-right-radius: 30px !important;
-}
-.back-color :hover {
-  background-color: rgb(249, 247, 242);
+.active-item {
+  background-color: #feefc3 !important;
   border-top-right-radius: 30px !important;
   border-bottom-right-radius: 30px !important;
 }

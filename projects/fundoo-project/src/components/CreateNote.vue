@@ -27,11 +27,10 @@ export default {
   emits: ['updateNotes'],
   methods: {
     close() {
-      const token = localStorage.getItem('loginToken')
       const data = { title: this.title, description: this.description }
       console.log('---------------------->', this.title, this.description)
       if (this.title != '' || this.description != '') {
-        addNotes(data, token)
+        addNotes(data)
           .then((res) => {
             this.snackbarText = 'Add Notes Successfully!!'
             this.snackbar = true
@@ -157,6 +156,7 @@ export default {
   padding-bottom: 2%;
   margin-left: 3%;
   padding-right: 2%;
+  white-space: pre-wrap;
   /* height: min-content; */
 }
 .inputBox::-webkit-input-placeholder {

@@ -42,10 +42,10 @@ export default {
 
 <template>
   <CreateNote @updateNotes="updateNotes" />
-  <DisplayNote :totalNotes="totalNotes" @updateData="filteredData" />
+  <DisplayNote :totalNotes="totalNotes" @updateData="filteredData" @updateNotes="updateNotes" />
 </template>
 
-<style>
+<style scoped>
 /* .media {
   display: flex;
   justify-content: center;
@@ -55,5 +55,8 @@ export default {
   .media {
     margin-left: -15%;
   }
+} */
+/* .v-overlay__scrim {
+  background: none !important;
 } */
 </style>
