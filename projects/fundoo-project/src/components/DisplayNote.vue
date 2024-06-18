@@ -41,7 +41,12 @@ export default {
     openDialog(item) {
       console.log(this.localDialog)
       this.localDialog = true
-      this.note = { id: item.id, title: item.title, description: item.description }
+      this.note = {
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        color: item.color
+      }
       console.log(this.note)
       console.log(this.localDialog)
     },
@@ -100,6 +105,74 @@ export default {
 </script>
 
 <template>
+  <!-- <v-container>
+    <v-row v-masonry>
+      <v-col cols="12" sm="4">
+        <v-dialog v-model="localDialog" max-width="600">
+          <template v-slot:activator="{ props: activatorProps }">
+            <masonry
+              :gutter="{ default: '30px', 700: '15px' }"
+              :cols="{ default: 3, 1000: 3, 700: 2, 500: 1 }"
+            >
+              <v-card
+                height="fit-content"
+                v-for="item in totalNotes"
+                :color="item.color"
+                class="pt-1 pb-1 mt-2 mb-2 note-card"
+                :key="item.id"
+                @mouseover="hoverIndex = item.id"
+                @mouseleave="hoverIndex = null"
+                outlined
+                hover
+                :style="{ backgroundColor: item.color }"
+                :class="{ check: clickedIndex === hoverIndex }"
+              >
+                <div class="pin-icon">
+                  <v-icon
+                    @click="pinned(item)"
+                    v-if="hoverIndex === item.id || menuCard === item.id"
+                  >
+                    {{ oneIcon.icon }}
+                  </v-icon>
+                </div>
+                <div class="check-card">
+                  <v-icon
+                    v-if="hoverIndex === item.id || menuCard === item.id"
+                    @click="onclickCheck(item.id)"
+                  >
+                    mdi-check-circle
+                  </v-icon>
+                </div>
+                <div v-bind="activatorProps" @click="openDialog(item)">
+                  <v-card-title flat dense>
+                    <pre class="title">{{ item.title }}</pre>
+                  </v-card-title>
+                  <v-card-text flat dense>
+                    <pre class="desc">{{ item.description }}</pre>
+                  </v-card-text>
+                </div>
+                <v-card-actions v-if="hoverIndex === item.id || menuCard === item.id">
+                  <IconButtons
+                    @load="this.$redrawVueMasonry()"
+                    @menuStateChanged="changeState(item.id, $event)"
+                    @updateNotes="updateNotes"
+                    @updateColor="updateColor"
+                    @stayMenuColor="stayMenuColor($event)"
+                    :show1="true"
+                    :hoverIndex="item.id"
+                    :totalNotes="this.totalNotes"
+                  />
+                </v-card-actions>
+                <div style="height: 64px" v-else></div>
+              </v-card>
+            </masonry>
+          </template>
+          <DialogBox :note="note" @updateNotes="updateNotes" />
+        </v-dialog>
+      </v-col>
+    </v-row>
+  </v-container> -->
+
   <div v-if="showPin" class="h-text">PINNED</div>
   <div class="flex" v-if="showPin">
     <v-dialog v-model="localDialog" max-width="600">
@@ -307,4 +380,9 @@ samp {
 .v-overlay__scrim {
   background-color: none !important;
 }
+/* details,
+main {
+  display: block;
+  width: 1300px;
+} */
 </style>
