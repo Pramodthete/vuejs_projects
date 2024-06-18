@@ -58,6 +58,14 @@ export const updateColorNotes = (data) => {
   }
   return postData(url, data, { headers })
 }
+export const pinedUnpinednotes = (data) => {
+  let url = `notes/pinUnpinNotes`
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: token
+  }
+  return postData(url, data, { headers })
+}
 
 export const getTrashNotes = () => {
   let url = `notes/getTrashNotesList`

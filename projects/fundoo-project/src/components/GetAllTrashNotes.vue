@@ -6,7 +6,8 @@ export default {
   data: () => ({
     deletedNotes: [],
     snackbar: false,
-    snackbarText: ''
+    snackbarText: '',
+    showPin: false
   }),
   components: {
     DisplayNote
@@ -32,7 +33,11 @@ export default {
 </script>
 
 <template>
-  <DisplayNote :totalNotes="deletedNotes" />
+  <DisplayNote :showPinT="false" :totalNotes="deletedNotes" />
 </template>
 
-<style></style>
+<style>
+.default[data-v-fedac4b6] {
+  width: 100%;
+}
+</style>

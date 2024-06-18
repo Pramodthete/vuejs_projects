@@ -10,6 +10,7 @@ export default {
       noteTitle: this.note?.title,
       noteDescription: this.note?.description,
       noteId: this.note?.id,
+      noteColor: this.note?.color,
       snackbar: false,
       snackbarText: '',
       oneIcon: { icon: 'mdi-pin-outline', action: () => console.log('Pin outline clicked') },
@@ -30,28 +31,33 @@ export default {
         title: this.noteTitle,
         description: this.noteDescription
       }
-      if (this.noteTitle !== '' || this.noteDescription !== '') {
-        updateNotes(data)
-          .then((res) => {
-            console.log(res)
-            this.$emit('updateNotes')
-          })
-          .catch((error) => {
-            console.log(error)
-          })
+
+      if (this.noteTitle !== this.title || this.noteDescription !== this.description) {
+        if (this.noteTitle !== '' || this.noteDescription !== '') {
+          updateNotes(data)
+            .then((res) => {
+              console.log(res)
+              this.$emit('updateNotes')
+            })
+            .catch((error) => {
+              console.log(error)
+            })
+        } else {
+          this.snackbarText = 'Cannot Update Empty Note ..'
+          this.snackbar = true
+        }
       } else {
-        this.snackbarText = 'Cannot Update Empty Note ..'
+        this.snackbarText = 'Data is not Edited ..'
         this.snackbar = true
       }
     }
-  },
-  watch: {}
+  }
 }
 </script>
 
 <template>
   <SnackBar :snackbar.sync="snackbar" :text="snackbarText" @update:snackbar="snackbar = $event" />
-  <v-card class="card">
+  <v-card class="card" :style="{ backgroundColor: noteColor }">
     <div style="display: inline; justify-content: space-between">
       <v-textarea
         class="inputBox"
@@ -106,7 +112,7 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.2em;
-  max-height: 7.2em; /* 6 lines * 1.2em line height */
+  max-height: 7.2em;
   word-break: break-word;
 }
 .card {

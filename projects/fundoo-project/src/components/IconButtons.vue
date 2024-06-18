@@ -1,6 +1,6 @@
 <script>
 import SnackBar from './SnackBar.vue'
-import { updateArchivedNotes, updateColorNotes } from '@/services/noteServices'
+import { updateArchivedNotes, updateColorNotes, deleteNote } from '@/services/noteServices'
 
 export default {
   components: { SnackBar },
@@ -18,13 +18,14 @@ export default {
     }
   },
   data: () => ({
-    pick: false,
+    pick: true,
     menu: false,
     file: null,
     imageUrl: null,
     snackbar: false,
     snackbarText: '',
     pin: false,
+    index: null,
     reminders: [
       { title: 'Tomorrow', time: '8:00 PM', icon: '', c: false },
       { title: 'Next week', time: 'Mon, 8:00 PM', icon: '', c: false },
@@ -60,7 +61,7 @@ export default {
   methods: {
     changeColor(color) {
       const data = { noteIdList: [this.$props.hoverIndex], color: color.color }
-      this.pick = false
+
       updateColorNotes(data)
         .then((res) => {
           this.$emit('updateColor', data)
@@ -114,6 +115,9 @@ export default {
       this.menu = !this.menu
       this.$emit('menuStateChanged', this.menu)
       event.stopPropagation()
+    },
+    stayMenu(index) {
+      this.$emit('stayMenuColor', index)
     }
   }
 }
@@ -128,7 +132,6 @@ export default {
           <template v-slot:activator="{ props }">
             <v-btn
               style="font-size: smaller; margin-left: -8px"
-              @click="menu = !menu"
               icon="mdi-bell-plus-outline"
               variant="text"
               v-bind="props"
@@ -139,7 +142,7 @@ export default {
           <v-list>
             <label style="margin-left: 5%" for="Reminder">Reminder:</label>
             <v-list-item
-              style="width: 300px; font-size: smaller; margin-left: -8px"
+              style="min-width: 300px; font-size: smaller"
               v-for="item in reminders"
               :key="item.id"
               :value="item.id"
@@ -166,21 +169,20 @@ export default {
             >
             </v-btn>
           </template>
-          <v-list style="margin-left: 40px; display: flex">
-            <v-list-item
-              style="display: flex; justify-content: space-evenly; flex-direction: column"
-              v-for="color in colors"
-              :key="color.name"
-              :value="color.color"
-            >
+          <v-list
+            style="display: flex; background-color: white"
+            @mouseover="index = 'hay'"
+            @mouseleave="index = 'hay'"
+            @click.stop="stayMenu(index)"
+          >
+            <v-list-item v-for="color in colors" :key="color.name" :value="color.color">
               <div
                 :style="{
                   backgroundColor: color.color,
-                  width: '30px',
-                  height: '30px',
+                  width: '35px',
+                  height: '35px',
                   borderRadius: '50%'
                 }"
-                v-show="!pick"
                 @click.stop="changeColor(color)"
               ></div>
             </v-list-item>
@@ -263,5 +265,8 @@ export default {
   border-radius: 50%;
   z-index: 1;
   margin-top: 400px;
+}
+.v-list-item--density-default:not(.v-list-item--nav).v-list-item--one-line {
+  padding-inline: 3px;
 }
 </style>

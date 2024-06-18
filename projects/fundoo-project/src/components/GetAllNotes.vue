@@ -9,11 +9,9 @@ export default {
     flag: Object
   },
   data: () => ({
-    deletedNotes: [],
-    archivedNotes: [],
-    pinnedNotes: [],
     totalNotes: [],
     notes: [],
+    pinedNotes: [],
     snackbar: false,
     snackbarText: ''
   }),
@@ -28,11 +26,10 @@ export default {
     responseData() {
       getNotesList()
         .then((res) => {
-          this.notes = res.data.data.data
+          this.notes = res.data.data.data.reverse()
 
-          // this.deletedNotes = this.notes.filter((note) => note.isDeleted)
-          // this.archivedNotes = this.notes.filter((note) => note.isArchived)
-          // this.pinnedNotes = this.notes.filter((note) => note.isPined)
+          this.pinedNotes = this.notes.filter((note) => note.isPined)
+
           this.totalNotes = this.notes.filter(
             (note) => !note.isDeleted && !note.isArchived && !note.isPined
           )
@@ -60,7 +57,7 @@ export default {
   <CreateNote @updateNotes="updateNotes" />
   <DisplayNote
     :totalNotes="totalNotes"
-    :deletedNotes="trashNotes"
+    :pinedNotes="pinedNotes"
     :flag="flag"
     @updateData="filteredData"
     @updateNotes="updateNotes"

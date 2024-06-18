@@ -2,25 +2,30 @@
 import IconButtons from './IconButtons.vue'
 import SnackBar from './SnackBar.vue'
 import DialogBox from './DialogBox.vue'
+import { pinedUnpinednotes } from '@/services/noteServices'
 
 export default {
   components: { SnackBar, IconButtons, DialogBox },
   props: {
-    totalNotes: Array
+    totalNotes: Array,
+    pinedNotes: Array,
+    showPinA: Boolean,
+    showPinT: Boolean
   },
   data: () => ({
     show1: false,
     menu: false,
     snackbar: false,
     snackbarText: '',
-    pin: true,
+    pin: false,
     hoverIndex: null,
     updatedColor: '#FFFFFF',
     clickedIndex: null,
     componentKey: 0,
     menuCard: null,
     localDialog: false,
-    commonNotes: [],
+    pinedNotes: [],
+    showPin: true,
     note: {},
     description: '',
     oneIcon: { icon: 'mdi-pin-outline', action: () => console.log('Pin-outline clicked') },
@@ -58,17 +63,104 @@ export default {
     },
     updateColor(item) {
       console.log(item.noteIdList[0])
-      console.log(this.clickedIndex)
       this.clickedIndex = item.noteIdList[0]
       this.updatedColor = item.color
       this.$emit('updateData')
+    },
+    stayMenuColor(hoverIndex) {
+      this.hoverIndex = hoverIndex
+      this.menuCard = hoverIndex
+    },
+    pinned(item) {
+      let pinValue = !item.isPined
+      const pinedData = { noteIdList: [item.id], isPined: pinValue }
+      pinedUnpinednotes(pinedData)
+        .then((data) => {
+          this.$emit('updateNotes')
+          console.log(data)
+          if (this.$props.pinedNotes === 0) {
+            this.showPin = false
+          } else {
+            this.showPin = true
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    }
+  },
+  mounted() {
+    if (this.$props.pinedNotes === 0) {
+      this.showPin = false
+    } else {
+      this.showPin = true
     }
   }
 }
 </script>
 
 <template>
+  <div v-if="showPin" class="h-text">PINNED</div>
+  <div class="flex" v-if="showPin">
+    <v-dialog v-model="localDialog" max-width="600">
+      <template v-slot:activator="{ props: activatorProps }">
+        <v-card
+          class="note-card"
+          v-for="item in pinedNotes"
+          :key="item.id"
+          @mouseover="hoverIndex = item.id"
+          @mouseleave="hoverIndex = null"
+          outlined
+          hover
+          :style="{ backgroundColor: item.color }"
+          :class="{ check: clickedIndex === hoverIndex }"
+        >
+          <div class="pin-icon">
+            <v-icon @click="pinned(item)" v-if="hoverIndex === item.id || menuCard === item.id">
+              {{ twoIcon.icon }}
+            </v-icon>
+          </div>
+          <div class="check-card">
+            <v-icon
+              v-if="hoverIndex === item.id || menuCard === item.id"
+              @click="onclickCheck(item.id)"
+            >
+              mdi-check-circle
+            </v-icon>
+          </div>
+          <div v-bind="activatorProps" @click="openDialog(item)">
+            <div>
+              <v-card-text>
+                <pre class="title">{{ item.title }}</pre>
+              </v-card-text>
+            </div>
+
+            <v-card-text>
+              <pre class="desc">{{ item.description }}</pre>
+            </v-card-text>
+          </div>
+
+          <div v-if="hoverIndex === item.id || menuCard === item.id">
+            <IconButtons
+              @menuStateChanged="changeState(item.id, $event)"
+              @updateNotes="updateNotes"
+              @updateColor="updateColor"
+              @stayMenuColor="stayMenuColor($event)"
+              :show1="true"
+              :hoverIndex="item.id"
+              :totalNotes="this.totalNotes"
+            />
+          </div>
+          <div style="height: 48px" v-else></div>
+        </v-card>
+      </template>
+      <DialogBox :note="note" @updateNotes="updateNotes" />
+    </v-dialog>
+  </div>
+
   <SnackBar :snackbar.sync="snackbar" :text="snackbarText" @update:snackbar="snackbar = $event" />
+  <br /><br />
+  <div v-if="showPin" class="h-text">OTHERS</div>
   <div class="flex">
     <v-dialog v-model="localDialog" max-width="600">
       <template v-slot:activator="{ props: activatorProps }">
@@ -84,8 +176,8 @@ export default {
           :class="{ check: clickedIndex === hoverIndex }"
         >
           <div class="pin-icon">
-            <v-icon v-if="hoverIndex === item.id || menuCard === item.id">
-              {{ oneIcon.icon + ' ' }}
+            <v-icon @click="pinned(item)" v-if="hoverIndex === item.id || menuCard === item.id">
+              {{ oneIcon.icon }}
             </v-icon>
           </div>
           <div class="check-card">
@@ -98,10 +190,14 @@ export default {
           </div>
           <div v-bind="activatorProps" @click="openDialog(item)">
             <div>
-              <v-card-text class="title"> {{ item.title }} </v-card-text>
+              <v-card-text>
+                <pre class="title">{{ item.title }}</pre>
+              </v-card-text>
             </div>
 
-            <v-card-text>{{ item.description }}</v-card-text>
+            <v-card-text>
+              <pre class="desc">{{ item.description }}</pre>
+            </v-card-text>
           </div>
 
           <div v-if="hoverIndex === item.id || menuCard === item.id">
@@ -109,6 +205,7 @@ export default {
               @menuStateChanged="changeState(item.id, $event)"
               @updateNotes="updateNotes"
               @updateColor="updateColor"
+              @stayMenuColor="stayMenuColor($event)"
               :show1="true"
               :hoverIndex="item.id"
               :totalNotes="this.totalNotes"
@@ -122,48 +219,31 @@ export default {
   </div>
 </template>
 
-<!-- <template>
-  <SnackBar :snackbar.sync="snackbar" :text="snackbarText" @update:snackbar="snackbar = $event" />
-
-  <div class="flex">
-    <v-card class="note-card" v-for="(item, index) in 15" :key="index" :value="item" outlined hover>
-      <v-dialog v-model="localDialog" max-width="500" min-height="200">
-        <template v-slot:activator="{ props: activatorProps }">
-          <div class="pin-icon">
-            <v-icon> mdi-pin-outline </v-icon>
-          </div>
-          <div
-            style="display: flex; justify-content: space-between"
-            v-bind="activatorProps"
-            @click="openDialog(item, index)"
-          >
-            <v-card-title class="title"> {{ item }}</v-card-title>
-          </div>
-          <div class="check-card">
-            <v-icon> mdi-check-circle </v-icon>
-          </div>
-          <v-card-text>{{ index }}</v-card-text>
-        </template>
-        <DialogBox :note="item" :id="index" :description="index" @closeDialog="closeDialog" />
-      </v-dialog>
-      <div>
-        <IconButtons
-          @menuStateChanged="changeState(index, $event)"
-          @updateNotes="updateNotes"
-          :show1="true"
-          :hoverIndex="index"
-          :totalNotes="this.totalNotes"
-        />
-      </div>
-      <div style="height: 48px"></div>
-    </v-card>
-  </div>
-</template> -->
-
 <style>
-.title {
-  font-weight: 600 !important;
+code,
+kbd,
+pre,
+samp {
+  font-family: sans-serif !important;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
+.title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3; /* Show only 3 lines */
+  overflow: hidden;
+  max-height: calc(1.3em * 3); /* Adjust the value to match your line height and number of lines */
+}
+
+.h-text {
+  font-size: smaller;
+  font-weight: bold;
+  color: gray;
+  margin-left: 6%;
+  margin-bottom: -2%;
+}
+
 .check-card {
   position: absolute;
   left: -10px;

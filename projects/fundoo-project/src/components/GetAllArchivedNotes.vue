@@ -6,7 +6,8 @@ export default {
   data: () => ({
     archivedNotes: [],
     snackbar: false,
-    snackbarText: ''
+    snackbarText: '',
+    showPin: false
   }),
   components: {
     DisplayNote
@@ -32,7 +33,7 @@ export default {
 </script>
 
 <template>
-  <DisplayNote :totalNotes="archivedNotes" />
+  <DisplayNote :showPinA="false" :totalNotes="archivedNotes" />
 </template>
 
 <style>
@@ -99,5 +100,10 @@ export default {
 }
 .v-overlay__scrim {
   background-color: none !important;
+}
+details[data-v-fedac4b6],
+main[data-v-fedac4b6] {
+  margin-left: 0px;
+  width: 100%;
 }
 </style>

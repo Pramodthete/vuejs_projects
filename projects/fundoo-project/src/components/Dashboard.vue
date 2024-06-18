@@ -5,7 +5,6 @@ export default {
 
   data: () => ({
     drawer: true,
-    group: null,
     show1: false,
     openRail: true,
     menu: false,
@@ -14,6 +13,7 @@ export default {
     flex: false,
     back: true,
     selectedIndex: 0,
+    clickIndex: false,
     trashNotes: [],
     flag: { name: '', noteFlag: false },
     items: [
@@ -31,6 +31,7 @@ export default {
     },
     dataChange(item, index) {
       this.selectedIndex = index
+      this.clickIndex = false
       if (item === 'trash') {
         this.$router.push({ name: 'getAllTrashNotes' })
       } else if (item === 'notes') {
@@ -105,15 +106,19 @@ export default {
         expand-on-hover
         :rail="openRail"
       >
-        <v-list class="back-color">
+        <v-list>
           <v-list-item
-            class="back-color"
             v-for="(item, index) in items"
             :id="index"
             :key="index"
             :title="item.title"
             :value="item.value"
-            :class="{ 'active-item': selectedIndex === index }"
+            :class="[
+              { 'back-color': selectedIndex === index && !clickIndex },
+              { clickChange: clickIndex && openRail && drawer && selectedIndex === index }
+            ]"
+            @mouseover="clickIndex = true"
+            @mouseleave="clickIndex = false"
             @click="dataChange(item.value, index)"
           >
             <template v-slot:prepend>
@@ -192,8 +197,13 @@ export default {
 .btn-avatar {
   color: gray;
 }
-.active-item {
+.back-color {
   background-color: #feefc3 !important;
+  border-radius: 40px !important;
+}
+.clickChange {
+  background-color: #feefc3 !important;
+  border-radius: 0 !important;
   border-top-right-radius: 30px !important;
   border-bottom-right-radius: 30px !important;
 }
@@ -267,5 +277,8 @@ main {
 }
 .v-messages {
   display: none;
+}
+.v-list-item--density-default:not(.v-list-item--nav).v-list-item--one-line {
+  padding-inline: 16px;
 }
 </style>
