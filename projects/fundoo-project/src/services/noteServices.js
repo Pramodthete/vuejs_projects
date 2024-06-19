@@ -12,7 +12,7 @@ export const addNotes = (data) => {
   return postData(url, data, headersOptions)
 }
 
-export const getNotesList = () => {
+export const getNotesList = (token) => {
   let url = `notes/getNotesList`
   let headersOptions = {
     headers: {
@@ -67,7 +67,7 @@ export const pinedUnpinednotes = (data) => {
   return postData(url, data, { headers })
 }
 
-export const getTrashNotes = () => {
+export const getTrashNotes = (token) => {
   let url = `notes/getTrashNotesList`
   const headers = {
     'Content-Type': 'application/json',
@@ -76,7 +76,16 @@ export const getTrashNotes = () => {
   return getData(url, { headers })
 }
 
-export const getArchivedNotes = () => {
+export const getReminders = (token) => {
+  let url = `notes/getTrashNotesList`
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: token
+  }
+  return getData(url, { headers })
+}
+
+export const getArchivedNotes = (token) => {
   let url = `notes/getArchiveNotesList`
   const headers = {
     'Content-Type': 'application/json',

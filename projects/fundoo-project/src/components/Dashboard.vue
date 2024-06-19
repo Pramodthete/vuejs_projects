@@ -38,6 +38,10 @@ export default {
         this.$router.push({ name: 'getAllNotes' })
       } else if (item === 'archived') {
         this.$router.push({ name: 'getAllArchivedNotes' })
+      } else if (item === 'lables') {
+        this.$router.push({ name: 'editLabels' })
+      } else if (item === 'reminders') {
+        this.$router.push({ name: 'getAllReminders' })
       } else {
         console.log('else')
       }
@@ -70,7 +74,7 @@ export default {
           role="presentation"
           style="width: 40px; height: 40px"
         />
-        <v-toolbar-title id="title">Keep</v-toolbar-title>
+        <v-toolbar-title id="title">Fundoo</v-toolbar-title>
 
         <v-card-text>
           <v-text-field
@@ -102,7 +106,7 @@ export default {
 
       <v-navigation-drawer
         v-model="drawer"
-        :location="$vuetify.display.mobile ? 'bottom' : undefined"
+        :location="$vuetify.display.mobile ? 'left' : 'left'"
         expand-on-hover
         :rail="openRail"
       >
@@ -186,7 +190,7 @@ export default {
 }
 
 #title {
-  font-size: x-large;
+  font-size: large;
   margin-left: 1px;
   color: gray;
 }

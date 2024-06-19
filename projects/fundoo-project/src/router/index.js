@@ -10,7 +10,7 @@ import GetAllNotes from '@/components/GetAllNotes.vue'
 import DialogBox from '@/views/DialogBoxView.vue'
 import GetAllTrashNotes from '@/views/GetAllTrashNotesView.vue'
 import GetAllArchivedNotes from '@/views/GetAllArchivedNotesView.vue'
-
+import GetAllReminders from '@/views/GetAllRemindersView.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -38,6 +38,11 @@ const router = createRouter({
           path: '/dashboard/archivedNotes',
           name: 'getAllArchivedNotes',
           component: GetAllArchivedNotes
+        },
+        {
+          path: '/dashboard/reminders',
+          name: 'getAllReminders',
+          component: GetAllReminders
         }
       ]
     },
@@ -80,12 +85,19 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue')
     }
   ]
+})
+router.beforeEach((to, from) => {
+  const loken = localStorage.getItem('loginToken')
+  let isAuthenticated = false
+  if (loken) {
+    isAuthenticated = true
+  }
+  if (!isAuthenticated && to.name !== 'login') {
+    return { name: 'login' }
+  }
 })
 
 export default router

@@ -113,6 +113,7 @@ export default {
             :class="['input-inner-icon', `icon-${index}`]"
             v-for="(item, index) in !show1 ? icons : ''"
             :key="index"
+            style="margin-right: 15px"
           >
             {{ item.icon }}
           </v-icon>
@@ -137,8 +138,7 @@ export default {
   justify-content: center;
 }
 .inputs {
-  max-width: 600px;
-  min-width: 500px;
+  min-width: 600px;
   position: relative;
   height: fit-content;
   box-shadow: 0px 1px 5px 0px rgb(144, 144, 144);

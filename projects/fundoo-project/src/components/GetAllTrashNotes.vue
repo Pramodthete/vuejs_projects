@@ -17,7 +17,8 @@ export default {
   },
   methods: {
     dataChange() {
-      getTrashNotes()
+      const token = localStorage.getItem('loginToken')
+      getTrashNotes(token)
         .then((res) => {
           console.log(res.data.data.data)
           this.deletedNotes = res.data.data.data.reverse()
@@ -27,13 +28,24 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+    },
+    updateColor() {
+      this.dataChange()
     }
   }
 }
 </script>
 
 <template>
-  <DisplayNote :showPinT="false" :totalNotes="deletedNotes" />
+  <div style="margin-top: -5%">
+    <DisplayNote
+      :showPinT="false"
+      @achived="updateColor"
+      @updateColor="updateColor"
+      @deleted="updateColor"
+      :totalNotes="deletedNotes"
+    />
+  </div>
 </template>
 
 <style>

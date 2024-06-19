@@ -24,17 +24,20 @@ export default {
   },
   methods: {
     responseData() {
-      getNotesList()
+      const token = localStorage.getItem('loginToken')
+      getNotesList(token)
         .then((res) => {
           this.notes = res.data.data.data.reverse()
-
           this.pinedNotes = this.notes.filter((note) => note.isPined)
 
           this.totalNotes = this.notes.filter(
             (note) => !note.isDeleted && !note.isArchived && !note.isPined
           )
+
           this.snackbarText = 'Fetched All Notes Successfully!!'
+
           this.snackbar = true
+
           console.log(this.totalNotes)
         })
         .catch((error) => {

@@ -15,6 +15,10 @@ export default {
     },
     totalNotes: {
       type: Array
+    },
+    archived: {
+      type: Boolean,
+      default: true
     }
   },
   data: () => ({
@@ -74,9 +78,10 @@ export default {
         })
     },
     moveToArchived() {
+      let ar = this.$props.archived
       const data = {
         noteIdList: [this.$props.hoverIndex],
-        isArchived: true
+        isArchived: ar
       }
       updateArchivedNotes(data)
         .then((res) => {
@@ -99,7 +104,8 @@ export default {
         deleteNote(data)
           .then((response) => {
             if (response.data.data.success === true) {
-              this.$emit('updateNotes', response)
+              this.$emit('updateNotes')
+              this.$emit('deleted')
             } else {
               console.warn('Unexpected response:', response)
             }

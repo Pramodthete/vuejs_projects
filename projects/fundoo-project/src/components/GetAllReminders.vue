@@ -1,17 +1,18 @@
 <script>
 import DisplayNote from './DisplayNote.vue'
-import { getArchivedNotes } from '@/services/noteServices'
+import CreateNote from './DisplayNote.vue'
+import { getReminders } from '@/services/noteServices'
 
 export default {
   data: () => ({
-    archivedNotes: [],
+    remindersNotes: [],
     snackbar: false,
     snackbarText: '',
-    showPin: false,
-    archived: false
+    showPinR: false
   }),
   components: {
-    DisplayNote
+    DisplayNote,
+    CreateNote
   },
   mounted() {
     this.dataChange()
@@ -19,10 +20,10 @@ export default {
   methods: {
     dataChange() {
       const token = localStorage.getItem('loginToken')
-      getArchivedNotes(token)
+      getReminders(token)
         .then((res) => {
           console.log(res.data.data.data)
-          this.archivedNotes = res.data.data.data.reverse()
+          this.remindersNotes = res.data.data.data.reverse()
           this.snackbarText = 'Trash Data Fetched'
           this.snackbar = true
         })
@@ -30,10 +31,7 @@ export default {
           console.log(error)
         })
     },
-    updateNotesInArchived() {
-      this.dataChange()
-    },
-    deleted() {
+    updateColor() {
       this.dataChange()
     }
   }
@@ -41,15 +39,9 @@ export default {
 </script>
 
 <template>
-  <div style="margin-top: -5%">
-    <DisplayNote
-      :showPinA="false"
-      :archived="archived"
-      @updateNotesInArchived="updateNotesInArchived"
-      @updateNotes="updateNotesInArchived"
-      @updateColor="updateNotesInArchived"
-      :totalNotes="archivedNotes"
-    />
+  <div>
+    <CreateNote :showPinR="false" />
+    <DisplayNote :showPinT="false" @updateColor="updateColor" :totalNotes="remindersNotes" />
   </div>
 </template>
 

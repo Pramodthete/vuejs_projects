@@ -9,8 +9,22 @@ export default {
   props: {
     totalNotes: Array,
     pinedNotes: Array,
-    showPinA: Boolean,
-    showPinT: Boolean
+    showPinA: {
+      type: Boolean,
+      default: true
+    },
+    showPinT: {
+      type: Boolean,
+      default: true
+    },
+    showPinR: {
+      type: Boolean,
+      default: true
+    },
+    archived: {
+      type: Boolean,
+      default: true
+    }
   },
   data: () => ({
     show1: false,
@@ -53,6 +67,7 @@ export default {
     updateNotes() {
       this.localDialog = false
       this.$emit('updateNotes')
+      this.$emit('deleted')
     },
     changeState(noteId, isVisible) {
       this.hoverIndex = null
@@ -70,7 +85,10 @@ export default {
       console.log(item.noteIdList[0])
       this.clickedIndex = item.noteIdList[0]
       this.updatedColor = item.color
-      this.$emit('updateData')
+      this.$emit('updateColor')
+    },
+    deleted() {
+      this.$emit('deleted')
     },
     stayMenuColor(hoverIndex) {
       this.hoverIndex = hoverIndex
@@ -82,6 +100,7 @@ export default {
       pinedUnpinednotes(pinedData)
         .then((data) => {
           this.$emit('updateNotes')
+          this.$emit('updateNotesInArchived')
           console.log(data)
           if (this.$props.pinedNotes === 0) {
             this.showPin = false
@@ -173,8 +192,8 @@ export default {
     </v-row>
   </v-container> -->
 
-  <div v-if="showPin" class="h-text">PINNED</div>
-  <div class="flex" v-if="showPin">
+  <div v-if="showPinT && showPinA && showPinR" class="h-text">PINNED</div>
+  <div class="flex" v-if="showPinT && showPinA && showPinR">
     <v-dialog v-model="localDialog" max-width="600">
       <template v-slot:activator="{ props: activatorProps }">
         <v-card
@@ -219,6 +238,7 @@ export default {
               @updateNotes="updateNotes"
               @updateColor="updateColor"
               @stayMenuColor="stayMenuColor($event)"
+              @deleted="deleted"
               :show1="true"
               :hoverIndex="item.id"
               :totalNotes="this.totalNotes"
@@ -233,7 +253,7 @@ export default {
 
   <SnackBar :snackbar.sync="snackbar" :text="snackbarText" @update:snackbar="snackbar = $event" />
   <br /><br />
-  <div v-if="showPin" class="h-text">OTHERS</div>
+  <div v-if="showPinT && showPinA && showPinR" class="h-text">OTHERS</div>
   <div class="flex">
     <v-dialog v-model="localDialog" max-width="600">
       <template v-slot:activator="{ props: activatorProps }">
@@ -279,6 +299,7 @@ export default {
               @updateNotes="updateNotes"
               @updateColor="updateColor"
               @stayMenuColor="stayMenuColor($event)"
+              :archived="this.archived"
               :show1="true"
               :hoverIndex="item.id"
               :totalNotes="this.totalNotes"
@@ -313,7 +334,7 @@ samp {
   font-size: smaller;
   font-weight: bold;
   color: gray;
-  margin-left: 6%;
+  margin-left: 4%;
   margin-bottom: -2%;
 }
 
