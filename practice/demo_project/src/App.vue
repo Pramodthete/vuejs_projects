@@ -1,21 +1,20 @@
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-import HomeVue from './components/HomeVue.vue'
+import ParentCom from './components/ParentCom.vue'
+import ChildCom from './components/ChildCom.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld,
-    HomeVue
+    ParentCom,
+    ChildCom
   }
 }
 </script>
 
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
-  <HomeVue/>
+  <ParentCom/>
+  <ChildCom/>
 </template>
 
 
