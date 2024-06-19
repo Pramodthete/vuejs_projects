@@ -26,6 +26,9 @@ export default {
   methods: {
     close() {
       this.dialog = false
+      console.log('close+++++++++++++')
+
+      this.$emit('dialogC', this.dialog)
       const data = {
         noteId: this.noteId,
         title: this.noteTitle,

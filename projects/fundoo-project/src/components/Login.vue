@@ -56,6 +56,7 @@ export default {
           this.resetForm()
           // this.$router.push({ name: 'signup' })
           localStorage.setItem('loginToken', data.data.id)
+          localStorage.setItem('userId', data.data.userId)
           console.log('Stored token:', localStorage.getItem('loginToken'))
           console.log('login token------->>>>>>', data.data.id)
           console.log('This is from server: _____>>>>>', data)

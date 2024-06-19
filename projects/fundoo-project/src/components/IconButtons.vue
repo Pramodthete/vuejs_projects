@@ -19,6 +19,10 @@ export default {
     archived: {
       type: Boolean,
       default: true
+    },
+    colorNote: {
+      type: String,
+      default: '#FFFFF'
     }
   },
   data: () => ({
@@ -64,7 +68,12 @@ export default {
   emits: ['menuStateChanged', 'updateNotes'],
   methods: {
     changeColor(color) {
-      const data = { noteIdList: [this.$props.hoverIndex], color: color.color }
+      const data = {}
+      if (this.$props.colorNote != '#FFFFF') {
+        data = { noteIdList: [this.$props.hoverIndex], color: color.color }
+      } else {
+        data = { noteIdList: [this.$props.hoverIndex], color: colorNote }
+      }
 
       updateColorNotes(data)
         .then((res) => {
