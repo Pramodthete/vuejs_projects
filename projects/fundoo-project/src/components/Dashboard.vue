@@ -1,7 +1,9 @@
 <script>
 import SnackBar from './SnackBar.vue'
+import EditLabelDialog from './EditLabelDialog.vue'
+
 export default {
-  components: { SnackBar },
+  components: { SnackBar, EditLabelDialog },
 
   data: () => ({
     drawer: true,
@@ -16,10 +18,12 @@ export default {
     clickIndex: false,
     trashNotes: [],
     flag: { name: '', noteFlag: false },
+    localDialog: false,
+    note: '',
     items: [
       { title: 'Notes', value: 'notes', icon: 'mdi-lightbulb-outline' },
       { title: 'Reminders', value: 'reminders', icon: 'mdi-bell-outline' },
-      { title: 'Edit lables', value: 'lables', icon: 'mdi-pencil-outline' },
+      { title: 'Edit labels', value: 'lables', icon: 'mdi-pencil-outline' },
       { title: 'Archive', value: 'archived', icon: 'mdi-archive-arrow-down-outline' },
       { title: 'Trash', value: 'trash', icon: 'mdi-trash-can-outline' }
     ]
@@ -27,7 +31,6 @@ export default {
   methods: {
     onRail() {
       this.openRail = !this.openRail
-      // @click.stop="drawer = !drawer"
     },
     dataChange(item, index) {
       this.selectedIndex = index
@@ -38,17 +41,29 @@ export default {
         this.$router.push({ name: 'getAllNotes' })
       } else if (item === 'archived') {
         this.$router.push({ name: 'getAllArchivedNotes' })
-      } else if (item === 'lables') {
-        this.$router.push({ name: 'editLabels' })
-      } else if (item === 'reminders') {
+      }
+      // else if (item === 'lables') {
+      //   this.$router.push({ name: 'editLabels' })
+      // }
+      else if (item === 'reminders') {
         this.$router.push({ name: 'getAllReminders' })
       } else {
-        console.log('else')
+        this.openDialog(item)
       }
     },
     onflexNotes() {
       this.flex = !this.flex
       console.log(this.flex)
+    },
+    openDialog(item) {
+      this.note = item.note || '' // Ensure the note is set correctly
+      this.localDialog = true
+    },
+    updateNotes(updatedNote) {
+      this.note = updatedNote
+    },
+    dialogC(close) {
+      this.localDialog = close
     }
   }
 }
@@ -132,9 +147,15 @@ export default {
         </v-list>
       </v-navigation-drawer>
     </v-layout>
+
     <div class="default" :class="{ 'drawer-open noteinput': !openRail }">
       <RouterView :trashNotes="trashNotes" :flag="flag" />
     </div>
+
+    <!-- Dialog box outside of the v-navigation-drawer to avoid multiple instances -->
+    <v-dialog v-model="localDialog" max-width="300">
+      <EditLabelDialog :note="note" @dialogC="dialogC" @updateNotes="updateNotes" />
+    </v-dialog>
   </v-card>
 </template>
 
@@ -143,7 +164,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  /* margin-left: 100px; */
+  margin-left: 10px;
 }
 .drawer-open {
   margin-left: 230px;
@@ -173,7 +194,6 @@ export default {
     margin-left: 0px;
   }
   .noteinput {
-    /* margin-right: 200px; */
     margin-left: 0px;
   }
   .search {
@@ -254,18 +274,6 @@ export default {
 .v-navigation-drawer--temporary.v-navigation-drawer--active {
   box-shadow: none;
 }
-/* .v-list-item--one-line {
-  border: 1px solid black;
-  border-radius: 200px;
-} */
-/* .v-list-item--density-default:not(.v-list-item--nav) {
-  border: 1px solid black;
-  border-radius: 20px;
-} */
-/* .v-list-item::after {
-  border: 1px solid black;
-  border-radius: 20px;
-} */
 details,
 main {
   margin-left: 10px;

@@ -16,6 +16,7 @@ export default {
     title: '',
     description: '',
     pin: false,
+    colorNote: '',
     icons: [
       { icon: 'mdi-checkbox-outline', action: () => console.log('checked clicked') },
       { icon: 'mdi-brush-outline', action: () => console.log('Brush clicked') },
@@ -68,6 +69,9 @@ export default {
         this.rules.title.every((rule) => rule(this.title) === true) &&
         this.rules.description.every((rule) => rule(this.description) === true)
       )
+    },
+    updateColor(item) {
+      this.colorNote = item.color
     }
   }
 }
@@ -75,7 +79,7 @@ export default {
 
 <template>
   <SnackBar :snackbar.sync="snackbar" :text="snackbarText" @update:snackbar="snackbar = $event" />
-  <div class="fit">
+  <div class="fit" :style="{ backgroundColor: colorNote }">
     <div class="inputs">
       <v-textarea
         class="inputBox"
@@ -121,7 +125,7 @@ export default {
       </v-textarea>
 
       <div style="display: flex; justify-content: space-between">
-        <IconButtons :show1="show1" />
+        <IconButtons :show1="show1" :colorNote="colorNote" @updateColor="updateColor" />
         <v-btn id="close" variant="text" v-if="show1" @click="close">Close</v-btn>
       </div>
     </div>
