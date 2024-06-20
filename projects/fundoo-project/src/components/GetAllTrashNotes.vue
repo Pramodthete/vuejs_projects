@@ -37,7 +37,11 @@ export default {
 </script>
 
 <template>
-  <div style="margin-top: -5%">
+  <div class="top">
+    <div class="inner-div">
+      <h3>Notes in Trash are deleted after 7 days.</h3>
+      <h3 style="color: blue">Empty Trash</h3>
+    </div>
     <DisplayNote
       :showPinT="false"
       @achived="updateColor"
@@ -51,5 +55,14 @@ export default {
 <style>
 .default[data-v-fedac4b6] {
   width: 100%;
+}
+.top {
+  margin-top: -2%;
+}
+.inner-div {
+  margin-bottom: -2%;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
 }
 </style>

@@ -48,9 +48,6 @@ export default {
     },
     updateNotes() {
       this.responseData()
-    },
-    filteredData() {
-      this.responseData()
     }
   }
 }
@@ -62,7 +59,8 @@ export default {
     :totalNotes="totalNotes"
     :pinedNotes="pinedNotes"
     :flag="flag"
-    @updateData="filteredData"
+    @updateData="updateNotes"
+    @updateColor="updateNotes"
     @updateNotes="updateNotes"
   />
 </template>

@@ -68,12 +68,12 @@ export default {
   emits: ['menuStateChanged', 'updateNotes'],
   methods: {
     changeColor(color) {
-      const data = {}
-      if (this.$props.colorNote != '#FFFFF') {
-        data = { noteIdList: [this.$props.hoverIndex], color: color.color }
-      } else {
-        data = { noteIdList: [this.$props.hoverIndex], color: colorNote }
-      }
+      const data = { noteIdList: [this.$props.hoverIndex], color: color.color }
+      // if (this.$props.colorNote != '') {
+      //   data = { noteIdList: [this.$props.hoverIndex], color: color.color }
+      // } else {
+      //   data = { noteIdList: [this.$props.hoverIndex], color: colorNote }
+      // }
 
       updateColorNotes(data)
         .then((res) => {
@@ -130,9 +130,6 @@ export default {
       this.menu = !this.menu
       this.$emit('menuStateChanged', this.menu)
       event.stopPropagation()
-    },
-    stayMenu(index) {
-      this.$emit('stayMenuColor', index)
     }
   }
 }
@@ -181,15 +178,11 @@ export default {
               icon="mdi-palette-outline"
               variant="text"
               v-bind="props"
+              @click.stop="toggleMenu"
             >
             </v-btn>
           </template>
-          <v-list
-            style="display: flex; background-color: white"
-            @mouseover="index = 'hay'"
-            @mouseleave="index = 'hay'"
-            @click.stop="stayMenu(index)"
-          >
+          <v-list style="display: flex; background-color: white">
             <v-list-item v-for="color in colors" :key="color.name" :value="color.color">
               <div
                 :style="{
