@@ -90,10 +90,6 @@ export default {
     deleted() {
       this.$emit('deleted')
     },
-    stayMenuColor(hoverIndex) {
-      this.hoverIndex = hoverIndex
-      this.menuCard = hoverIndex
-    },
     pinned(item) {
       let pinValue = !item.isPined
       const pinedData = { noteIdList: [item.id], isPined: pinValue }
@@ -125,6 +121,7 @@ export default {
 </script>
 
 <template>
+  <br />
   <div v-if="showPinT && showPinA && showPinR" class="h-text">PINNED</div>
   <div class="flex" v-if="showPinT && showPinA && showPinR">
     <v-dialog v-model="localDialog" max-width="600">
@@ -168,9 +165,9 @@ export default {
           <div v-if="hoverIndex === item.id || menuCard === item.id">
             <IconButtons
               @menuStateChanged="changeState(item.id, $event)"
+              @stayMenuColor="stayMenuColor(item.id, $event)"
               @updateNotes="updateNotes"
               @updateColor="updateColor"
-              @stayMenuColor="stayMenuColor($event)"
               @deleted="deleted"
               :show1="true"
               :hoverIndex="item.id"
@@ -231,7 +228,6 @@ export default {
               @menuStateChanged="changeState(item.id, $event)"
               @updateNotes="updateNotes"
               @updateColor="updateColor"
-              @stayMenuColor="stayMenuColor($event)"
               :archived="this.archived"
               :show1="true"
               :hoverIndex="item.id"
@@ -261,13 +257,15 @@ samp {
   -webkit-line-clamp: 3; /* Show only 3 lines */
   overflow: hidden;
   max-height: calc(1.3em * 3); /* Adjust the value to match your line height and number of lines */
+  margin-bottom: -10px;
+  font-size: larger;
 }
 
 .h-text {
   font-size: smaller;
   font-weight: bold;
   color: gray;
-  margin-left: 4%;
+  margin-left: 2%;
   margin-bottom: -2%;
 }
 
@@ -296,7 +294,7 @@ samp {
   border-radius: 10px;
   overflow: visible !important;
 }
-/* 
+/*
 .note-card:hover .icon-buttons {
   display: inline;
 }*/

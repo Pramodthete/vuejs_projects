@@ -1,6 +1,7 @@
 <script>
 import SnackBar from './SnackBar.vue'
 import EditLabelDialog from './EditLabelDialog.vue'
+import { getAllLabels } from '../services/labelService'
 
 export default {
   components: { SnackBar, EditLabelDialog },
@@ -20,14 +21,16 @@ export default {
     flag: { name: '', noteFlag: false },
     localDialog: false,
     note: '',
+    labelsList: [],
     items: [
       { title: 'Notes', value: 'notes', icon: 'mdi-lightbulb-outline' },
       { title: 'Reminders', value: 'reminders', icon: 'mdi-bell-outline' },
-      { title: 'Edit labels', value: 'lables', icon: 'mdi-pencil-outline' },
+      { title: 'Edit labels', value: 'labels', icon: 'mdi-pencil-outline' },
       { title: 'Archive', value: 'archived', icon: 'mdi-archive-arrow-down-outline' },
       { title: 'Trash', value: 'trash', icon: 'mdi-trash-can-outline' }
     ]
   }),
+
   methods: {
     onRail() {
       this.openRail = !this.openRail
@@ -41,14 +44,12 @@ export default {
         this.$router.push({ name: 'getAllNotes' })
       } else if (item === 'archived') {
         this.$router.push({ name: 'getAllArchivedNotes' })
-      }
-      // else if (item === 'lables') {
-      //   this.$router.push({ name: 'editLabels' })
-      // }
-      else if (item === 'reminders') {
+      } else if (item === 'labels') {
+        this.openDialog(item)
+      } else if (item === 'reminders') {
         this.$router.push({ name: 'getAllReminders' })
       } else {
-        this.openDialog(item)
+        console.log('in label')
       }
     },
     onflexNotes() {
@@ -56,7 +57,7 @@ export default {
       console.log(this.flex)
     },
     openDialog(item) {
-      this.note = item.note || '' // Ensure the note is set correctly
+      this.note = item.note || ''
       this.localDialog = true
     },
     updateNotes(updatedNote) {
@@ -64,7 +65,46 @@ export default {
     },
     dialogC(close) {
       this.localDialog = close
+    },
+    updateLabels(labelsList) {
+      console.log('-------', labelsList)
+      this.items = [
+        { title: 'Notes', value: 'notes', icon: 'mdi-lightbulb-outline' },
+        { title: 'Reminders', value: 'reminders', icon: 'mdi-bell-outline' },
+        { title: 'Edit labels', value: 'labels', icon: 'mdi-pencil-outline' },
+        { title: 'Archive', value: 'archived', icon: 'mdi-archive-arrow-down-outline' },
+        { title: 'Trash', value: 'trash', icon: 'mdi-trash-can-outline' }
+      ]
+
+      this.items.splice(
+        2,
+        0,
+        ...labelsList.map((label) => ({
+          title: label.label,
+          value: label.id,
+          icon: 'mdi-label-outline'
+        }))
+      )
+      console.log(this.items)
+    },
+    getLabels() {
+      const token = localStorage.getItem('loginToken')
+      getAllLabels(token)
+        .then((res) => {
+          this.labelsList = res.data.data.details.reverse()
+          console.log(this.labelsList)
+          this.updateLabels(this.labelsList)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    updateLabelsData() {
+      this.getLabels()
     }
+  },
+  mounted() {
+    this.getLabels()
   }
 }
 </script>
@@ -130,7 +170,7 @@ export default {
             v-for="(item, index) in items"
             :id="index"
             :key="index"
-            :title="item.title"
+            :title="item.title || item.label"
             :value="item.value"
             :class="[
               { 'back-color': selectedIndex === index && !clickIndex },
@@ -141,7 +181,8 @@ export default {
             @click="dataChange(item.value, index)"
           >
             <template v-slot:prepend>
-              <v-icon :icon="item.icon" variant="text"></v-icon>
+              <v-icon v-if="item.icon" :icon="item.icon" variant="text"></v-icon>
+              <v-icon v-else variant="text">mdi-label</v-icon>
             </template>
           </v-list-item>
         </v-list>
@@ -154,7 +195,13 @@ export default {
 
     <!-- Dialog box outside of the v-navigation-drawer to avoid multiple instances -->
     <v-dialog v-model="localDialog" max-width="300">
-      <EditLabelDialog :note="note" @dialogC="dialogC" @updateNotes="updateNotes" />
+      <EditLabelDialog
+        :note="note"
+        @dialogC="dialogC"
+        @updateNotes="updateNotes"
+        @updateLabels="updateLabelsData"
+        :labelsList="labelsList"
+      />
     </v-dialog>
   </v-card>
 </template>
@@ -214,6 +261,7 @@ export default {
   margin-left: 1px;
   color: gray;
 }
+
 .btn-3 {
   margin-right: 1.7%;
   color: gray;
@@ -292,5 +340,16 @@ main {
 }
 .v-list-item--density-default:not(.v-list-item--nav).v-list-item--one-line {
   padding-inline: 16px;
+}
+
+.v-navigation-drawer__conten::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+.scroll {
+  display: inline-block;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border: 1px solid;
+  height: 50;
 }
 </style>

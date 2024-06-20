@@ -41,7 +41,7 @@ export default {
 </script>
 
 <template>
-  <div style="margin-top: -5%">
+  <div style="margin-top: -7%">
     <DisplayNote
       :showPinA="false"
       :archived="archived"
