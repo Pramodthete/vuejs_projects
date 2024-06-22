@@ -8,7 +8,6 @@ export default {
       dialog: false,
       pin: false,
       edit: false,
-      update: false,
       snackbar: false,
       snackbarText: '',
       label: '',
@@ -42,6 +41,8 @@ export default {
           console.log(data)
           this.l = this.label
           this.label = null
+          this.snackbarText = 'Label Added Successfully'
+          this.snackbar = true
           this.$emit('updateLabels')
         })
         .catch((error) => {
@@ -76,6 +77,8 @@ export default {
       updateLabels(data, id)
         .then((res) => {
           console.log(res)
+          this.snackbarText = 'Label Updated Successfully'
+          this.snackbar = true
           this.$emit('updateLabels')
         })
         .catch((error) => {
@@ -97,13 +100,14 @@ export default {
         placeholder="Create new label"
         variant="underlined"
         v-model="label"
+        @click="pin = !pin"
       >
         <template v-slot:append>
-          <v-icon v-if="pin == true"> mdi-check </v-icon>
+          <v-icon v-if="pin" @click="saveLabel"> mdi-check </v-icon>
         </template>
         <template v-slot:prepend>
-          <v-icon v-if="pin == true" @click="pin = false"> mdi-close </v-icon>
-          <v-icon v-else @click="pin = true">mdi-plus </v-icon>
+          <v-icon v-if="pin" @click="pin = !pin"> mdi-close </v-icon>
+          <v-icon v-else @click="pin = !pin">mdi-plus </v-icon>
         </template>
       </v-text-field>
 
@@ -114,8 +118,10 @@ export default {
               variant="plain"
               v-show="true"
               @mouseover="hoverIndex = label.id"
+              @mouseleave="hoverIndex = null"
               @click="clickIndex = label.id"
-              :model-value="label.label"
+              v-model="label.label"
+              placeholder="Enter Label Name"
               ><template v-slot:append>
                 <v-icon
                   v-show="clickIndex === label.id"

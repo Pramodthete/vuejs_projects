@@ -73,6 +73,10 @@ export default {
       this.hoverIndex = null
       this.menuCard = isVisible ? noteId : null
     },
+    changeStateLabels(noteId, isVisible) {
+      this.hoverIndex = null
+      this.menuCard = isVisible ? noteId : null
+    },
     closeDialog(data) {
       this.localDialog = false
       console.log(data)
@@ -166,6 +170,7 @@ export default {
             <IconButtons
               @menuStateChanged="changeState(item.id, $event)"
               @stayMenuColor="stayMenuColor(item.id, $event)"
+              @changeStateLabels="changeStateLabels(item.id, $event)"
               @updateNotes="updateNotes"
               @updateColor="updateColor"
               @deleted="deleted"
@@ -226,6 +231,7 @@ export default {
           <div v-if="hoverIndex === item.id || menuCard === item.id">
             <IconButtons
               @menuStateChanged="changeState(item.id, $event)"
+              @changeStateLabels="changeStateLabels(item.id, $event)"
               @updateNotes="updateNotes"
               @updateColor="updateColor"
               :archived="this.archived"

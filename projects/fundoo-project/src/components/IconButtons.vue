@@ -26,6 +26,17 @@ export default {
     }
   },
   data: () => ({
+    showMenu: false,
+    showCheckboxMenu: false,
+    checkboxes: [
+      { label: 'Checkbox 1', checked: false },
+      { label: 'Checkbox 2', checked: false },
+      { label: 'Checkbox 3', checked: false },
+      { label: 'Checkbox 1', checked: false },
+      { label: 'Checkbox 2', checked: false },
+      { label: 'Checkbox 3', checked: false }
+    ],
+
     pick: true,
     menu: false,
     file: null,
@@ -34,6 +45,9 @@ export default {
     snackbarText: '',
     pin: false,
     index: null,
+    subMenu: false,
+    mainMenu: false,
+    submenuOffset: { x: 0, y: 0 },
     reminders: [
       { title: 'Tomorrow', time: '8:00 PM', icon: '', c: false },
       { title: 'Next week', time: 'Mon, 8:00 PM', icon: '', c: false },
@@ -67,13 +81,13 @@ export default {
   }),
   emits: ['menuStateChanged', 'updateNotes'],
   methods: {
+    toggleCheckboxMenu(event) {
+      this.showCheckboxMenu = !this.showCheckboxMenu
+      // this.$emit('changeStateLabels', this.showCheckboxMenu)
+      event.stopPropagation()
+    },
     changeColor(color) {
       const data = { noteIdList: [this.$props.hoverIndex], color: color.color }
-      // if (this.$props.colorNote != '') {
-      //   data = { noteIdList: [this.$props.hoverIndex], color: color.color }
-      // } else {
-      //   data = { noteIdList: [this.$props.hoverIndex], color: colorNote }
-      // }
 
       updateColorNotes(data)
         .then((res) => {
@@ -105,7 +119,19 @@ export default {
           console.log(error)
         })
     },
-    menus(title) {
+    handleMenuClick(item, event) {
+      if (item.title === 'Add Label') {
+        console.log('Selected:', item.title)
+        this.showCheckboxMenu = true
+        this.showMenu = false
+        this.$emit('changeStateLabels', this.showCheckboxMenu)
+        event.stopPropagation()
+      } else {
+        this.delete(item.title)
+        this.mainMenu = false
+      }
+    },
+    delete(title) {
       if (title === 'Delete Note') {
         const data = { noteIdList: [this.hoverIndex], isDeleted: true }
         console.log('Data being sent to deleteNote:', data)
@@ -115,6 +141,8 @@ export default {
             if (response.data.data.success === true) {
               this.$emit('updateNotes')
               this.$emit('deleted')
+              this.snackbarText = 'Note Deleted !!'
+              this.snackbar = true
             } else {
               console.warn('Unexpected response:', response)
             }
@@ -122,11 +150,10 @@ export default {
           .catch((error) => {
             console.log(error)
           })
-      } else {
-        console.log('-----------> select correct option')
       }
     },
     toggleMenu(event) {
+      this.showMenu = !this.showMenu
       this.menu = !this.menu
       this.$emit('menuStateChanged', this.menu)
       event.stopPropagation()
@@ -215,7 +242,7 @@ export default {
           icon="mdi-archive-arrow-down-outline"
           variant="text"
         ></v-btn>
-        <v-menu>
+        <v-menu v-if="!showCheckboxMenu">
           <template v-slot:activator="{ props }">
             <v-btn
               style="font-size: smaller; margin-left: -8px"
@@ -226,16 +253,41 @@ export default {
             >
             </v-btn>
           </template>
-          <v-list>
+          <v-list v-if="showMenu">
             <v-list-item
               style="width: 200px"
               v-for="(item, index) in notesOptions"
               :key="index"
               :value="index"
-              @click.stop
-              @click="menus(item.title)"
+              @click.stop="handleMenuClick(item, $event)"
             >
               {{ item.title }}
+            </v-list-item>
+          </v-list>
+        </v-menu>
+        <v-menu v-model="showCheckboxMenu">
+          <template v-slot:activator="{ props }">
+            <v-btn
+              style="font-size: smaller; margin-left: -8px"
+              variant="text"
+              v-bind="props"
+              @click.stop="toggleCheckboxMenu"
+            >
+            </v-btn>
+          </template>
+          <v-list style="width: 200px">
+            <div>Label Note</div>
+            <v-text-field placeholder="Enter Label Name" variant="plain">
+              <template v-slot:append>
+                <v-icon> mdi-magnify </v-icon>
+              </template>
+            </v-text-field>
+            <v-list-item v-for="(checkbox, index) in checkboxes" :key="index">
+              <v-checkbox
+                class="check-box-label"
+                v-model="checkbox.checked"
+                :label="checkbox.label"
+              ></v-checkbox>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -276,5 +328,16 @@ export default {
 }
 .v-list-item--density-default:not(.v-list-item--nav).v-list-item--one-line {
   padding-inline: 3px;
+}
+.v-checkbox .v-selection-control {
+  height: 20px;
+}
+.v-input__details {
+  display: none;
+}
+.check-box-label {
+  height: 37px !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 </style>

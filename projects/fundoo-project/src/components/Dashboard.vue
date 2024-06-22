@@ -352,4 +352,7 @@ main {
   border: 1px solid;
   height: 50;
 }
+.v-navigation-drawer--mobile {
+  transform: translateX(0px) !important;
+}
 </style>
