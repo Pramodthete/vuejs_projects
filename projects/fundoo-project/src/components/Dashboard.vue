@@ -67,7 +67,6 @@ export default {
       this.localDialog = close
     },
     updateLabels(labelsList) {
-      console.log('-------', labelsList)
       this.items = [
         { title: 'Notes', value: 'notes', icon: 'mdi-lightbulb-outline' },
         { title: 'Reminders', value: 'reminders', icon: 'mdi-bell-outline' },
@@ -85,14 +84,14 @@ export default {
           icon: 'mdi-label-outline'
         }))
       )
-      console.log(this.items)
+      console.log('items :', this.items)
+      console.log('label list :', this.labelsList)
     },
     getLabels() {
       const token = localStorage.getItem('loginToken')
       getAllLabels(token)
         .then((res) => {
           this.labelsList = res.data.data.details.reverse()
-          console.log(this.labelsList)
           this.updateLabels(this.labelsList)
         })
         .catch((error) => {
@@ -190,7 +189,7 @@ export default {
     </v-layout>
 
     <div class="default" :class="{ 'drawer-open noteinput': !openRail }">
-      <RouterView :trashNotes="trashNotes" :flag="flag" />
+      <RouterView :trashNotes="trashNotes" :labelsList="labelsList" :flag="flag" />
     </div>
 
     <!-- Dialog box outside of the v-navigation-drawer to avoid multiple instances -->

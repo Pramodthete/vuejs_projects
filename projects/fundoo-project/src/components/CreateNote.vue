@@ -17,6 +17,7 @@ export default {
     description: '',
     pin: false,
     colorNote: '',
+    list: [],
     icons: [
       { icon: 'mdi-checkbox-outline', action: () => console.log('checked clicked') },
       { icon: 'mdi-brush-outline', action: () => console.log('Brush clicked') },
@@ -29,7 +30,6 @@ export default {
   methods: {
     close() {
       const data = { title: this.title, description: this.description }
-      console.log('---------------------->', this.title, this.description)
       if (this.title != '' || this.description != '') {
         addNotes(data)
           .then((res) => {
@@ -53,6 +53,7 @@ export default {
     }
   },
   mounted() {
+    console.log('labels list:', this.list)
     document.addEventListener('click', this.handleClickOutside)
   },
   computed: {

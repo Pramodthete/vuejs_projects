@@ -18,7 +18,7 @@ export default {
     }
   },
   props: {
-    labelsList: []
+    labelsList: Array
   },
   components: {
     IconButtons
@@ -65,7 +65,6 @@ export default {
     },
     pined() {
       this.pin = false
-      console.log('++++++=====')
     },
     updateOneLabels(label, id) {
       const userId = localStorage.getItem('userId')

@@ -9,6 +9,7 @@ export default {
   props: {
     totalNotes: Array,
     pinedNotes: Array,
+    labelsList: Array,
     showPinA: {
       type: Boolean,
       default: true
@@ -39,13 +40,14 @@ export default {
     menuCard: null,
     localDialog: false,
     pinedNotes: [],
+    list: [],
     showPin: true,
     note: {},
     description: '',
     oneIcon: { icon: 'mdi-pin-outline', action: () => console.log('Pin-outline clicked') },
     twoIcon: { icon: 'mdi-pin', action: () => console.log('Pin clicked') }
   }),
-  emits: ['updateData', 'closeDialog'],
+  emits: ['updateData', 'closeDialog', 'deleted'],
   watch: {
     dialog(newVal) {
       this.localDialog = newVal
@@ -70,10 +72,7 @@ export default {
       this.$emit('deleted')
     },
     changeState(noteId, isVisible) {
-      this.hoverIndex = null
-      this.menuCard = isVisible ? noteId : null
-    },
-    changeStateLabels(noteId, isVisible) {
+      this.list = this.$props.labelsList
       this.hoverIndex = null
       this.menuCard = isVisible ? noteId : null
     },
@@ -86,7 +85,6 @@ export default {
       this.clickedIndex = id
     },
     updateColor(item) {
-      console.log(item.noteIdList[0])
       this.clickedIndex = item.noteIdList[0]
       this.updatedColor = item.color
       this.$emit('updateColor')
@@ -101,7 +99,6 @@ export default {
         .then((data) => {
           this.$emit('updateNotes')
           this.$emit('updateNotesInArchived')
-          console.log(data)
           if (this.$props.pinedNotes === 0) {
             this.showPin = false
           } else {
@@ -115,6 +112,7 @@ export default {
   },
 
   mounted() {
+    this.list = this.$props.labelsList
     if (this.$props.pinedNotes === 0) {
       this.showPin = false
     } else {
@@ -169,14 +167,14 @@ export default {
           <div v-if="hoverIndex === item.id || menuCard === item.id">
             <IconButtons
               @menuStateChanged="changeState(item.id, $event)"
-              @stayMenuColor="stayMenuColor(item.id, $event)"
-              @changeStateLabels="changeStateLabels(item.id, $event)"
+              @changeStateLabel="changeState(item.id, $event)"
               @updateNotes="updateNotes"
               @updateColor="updateColor"
               @deleted="deleted"
               :show1="true"
               :hoverIndex="item.id"
               :totalNotes="this.totalNotes"
+              :labelsLists="this.list"
             />
           </div>
           <div style="height: 48px" v-else></div>
@@ -227,6 +225,7 @@ export default {
               <pre class="desc">{{ item.description }}</pre>
             </v-card-text>
           </div>
+          <div v-for="l in list"></div>
 
           <div v-if="hoverIndex === item.id || menuCard === item.id">
             <IconButtons

@@ -23,19 +23,15 @@ export default {
     colorNote: {
       type: String,
       default: '#FFFFF'
+    },
+    labelsLists: {
+      type: Array
     }
   },
   data: () => ({
     showMenu: false,
     showCheckboxMenu: false,
-    checkboxes: [
-      { label: 'Checkbox 1', checked: false },
-      { label: 'Checkbox 2', checked: false },
-      { label: 'Checkbox 3', checked: false },
-      { label: 'Checkbox 1', checked: false },
-      { label: 'Checkbox 2', checked: false },
-      { label: 'Checkbox 3', checked: false }
-    ],
+    checkboxes: [],
 
     pick: true,
     menu: false,
@@ -46,8 +42,7 @@ export default {
     pin: false,
     index: null,
     subMenu: false,
-    mainMenu: false,
-    submenuOffset: { x: 0, y: 0 },
+    selectedValues: [],
     reminders: [
       { title: 'Tomorrow', time: '8:00 PM', icon: '', c: false },
       { title: 'Next week', time: 'Mon, 8:00 PM', icon: '', c: false },
@@ -79,11 +74,11 @@ export default {
       { title: 'Version history' }
     ]
   }),
-  emits: ['menuStateChanged', 'updateNotes'],
+  emits: ['menuStateChanged', 'updateNotes', 'changeStateLabel'],
   methods: {
     toggleCheckboxMenu(event) {
-      this.showCheckboxMenu = !this.showCheckboxMenu
-      // this.$emit('changeStateLabels', this.showCheckboxMenu)
+      // this.showCheckboxMenu = !this.showCheckboxMenu
+      // this.$emit('changeState', this.menu)
       event.stopPropagation()
     },
     changeColor(color) {
@@ -121,10 +116,10 @@ export default {
     },
     handleMenuClick(item, event) {
       if (item.title === 'Add Label') {
-        console.log('Selected:', item.title)
+        this.checkboxes = this.$props.labelsLists
         this.showCheckboxMenu = true
         this.showMenu = false
-        this.$emit('changeStateLabels', this.showCheckboxMenu)
+        this.$emit('changeStateLabel', this.showCheckboxMenu)
         event.stopPropagation()
       } else {
         this.delete(item.title)
@@ -157,7 +152,13 @@ export default {
       this.menu = !this.menu
       this.$emit('menuStateChanged', this.menu)
       event.stopPropagation()
+    },
+    updateSelectedValues() {
+      console.log(this.selectedValues)
     }
+  },
+  mounted() {
+    this.checkboxes = this.$props.labelsLists
   }
 }
 </script>
@@ -242,7 +243,7 @@ export default {
           icon="mdi-archive-arrow-down-outline"
           variant="text"
         ></v-btn>
-        <v-menu v-if="!showCheckboxMenu">
+        <v-menu>
           <template v-slot:activator="{ props }">
             <v-btn
               style="font-size: smaller; margin-left: -8px"
@@ -253,7 +254,7 @@ export default {
             >
             </v-btn>
           </template>
-          <v-list v-if="showMenu">
+          <v-list v-if="!showCheckboxMenu || showMenu">
             <v-list-item
               style="width: 200px"
               v-for="(item, index) in notesOptions"
@@ -268,7 +269,7 @@ export default {
         <v-menu v-model="showCheckboxMenu">
           <template v-slot:activator="{ props }">
             <v-btn
-              style="font-size: smaller; margin-left: -8px"
+              style="font-size: smaller; margin-left: -8px; visibility: hidden"
               variant="text"
               v-bind="props"
               @click.stop="toggleCheckboxMenu"
@@ -282,11 +283,13 @@ export default {
                 <v-icon> mdi-magnify </v-icon>
               </template>
             </v-text-field>
-            <v-list-item v-for="(checkbox, index) in checkboxes" :key="index">
+            <v-list-item v-for="checkbox in checkboxes" :key="checkbox.id">
               <v-checkbox
                 class="check-box-label"
-                v-model="checkbox.checked"
+                :value="checkbox.label"
+                v-model="selectedValues"
                 :label="checkbox.label"
+                @change="updateSelectedValues"
               ></v-checkbox>
             </v-list-item>
           </v-list>

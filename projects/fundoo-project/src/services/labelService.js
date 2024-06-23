@@ -47,3 +47,15 @@ export const updateLabels = (data, id) => {
   }
   return patchData(url, data, headersOptions)
 }
+
+export const addLabelToNote = (noteId, labelId) => {
+  console.log('in service label')
+  let url = `notes/${noteId}/addLabelToNotes/${labelId}/add`
+  let headersOptions = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    }
+  }
+  return postData(url, data, headersOptions)
+}

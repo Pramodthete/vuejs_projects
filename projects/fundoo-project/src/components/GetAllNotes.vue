@@ -6,12 +6,14 @@ import { getNotesList } from '@/services/noteServices'
 export default {
   props: {
     trashNotes: Array,
+    labelsList: Array,
     flag: Object
   },
   data: () => ({
     totalNotes: [],
     notes: [],
     pinedNotes: [],
+    labels: [],
     snackbar: false,
     snackbarText: ''
   }),
@@ -33,7 +35,8 @@ export default {
           this.totalNotes = this.notes.filter(
             (note) => !note.isDeleted && !note.isArchived && !note.isPined
           )
-
+          this.labels = this.$props.labelsList
+          console.log('labels:', this.labels)
           this.snackbarText = 'Fetched All Notes Successfully!!'
 
           this.snackbar = true
@@ -57,6 +60,7 @@ export default {
   <CreateNote @updateNotes="updateNotes" />
   <DisplayNote
     :totalNotes="totalNotes"
+    :labelsList="labels"
     :pinedNotes="pinedNotes"
     :flag="flag"
     @updateData="updateNotes"
