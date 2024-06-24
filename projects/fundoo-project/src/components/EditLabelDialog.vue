@@ -1,6 +1,6 @@
 <script>
 import IconButtons from './IconButtons.vue'
-import { addLabels, deleteLabels, updateLabels } from '../services/labelService'
+import { addLabels, deleteLabels, updateLabels } from '../services/labelServices'
 
 export default {
   data() {

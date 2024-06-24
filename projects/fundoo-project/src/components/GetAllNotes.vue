@@ -7,7 +7,7 @@ export default {
   props: {
     trashNotes: Array,
     labelsList: Array,
-    flag: Object
+    flex: Boolean
   },
   data: () => ({
     totalNotes: [],
@@ -62,10 +62,12 @@ export default {
     :totalNotes="totalNotes"
     :labelsList="labels"
     :pinedNotes="pinedNotes"
-    :flag="flag"
+    :flex="flex"
+    @removeLabel="updateNotes"
     @updateData="updateNotes"
     @updateColor="updateNotes"
     @updateNotes="updateNotes"
+    @addLabelToNote="updateNotes"
   />
 </template>
 

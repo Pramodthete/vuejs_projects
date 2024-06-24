@@ -3,6 +3,7 @@ import IconButtons from './IconButtons.vue'
 import SnackBar from './SnackBar.vue'
 import DialogBox from './DialogBox.vue'
 import { pinedUnpinednotes } from '@/services/noteServices'
+import { removeLabelsOnNote } from '@/services/labelServices'
 
 export default {
   components: { SnackBar, IconButtons, DialogBox },
@@ -13,6 +14,22 @@ export default {
     showPinA: {
       type: Boolean,
       default: true
+    },
+    flex: {
+      type: Boolean,
+      default: false
+    },
+    flexA: {
+      type: Boolean,
+      default: false
+    },
+    flexR: {
+      type: Boolean,
+      default: false
+    },
+    flexT: {
+      type: Boolean,
+      default: false
     },
     showPinT: {
       type: Boolean,
@@ -43,11 +60,19 @@ export default {
     list: [],
     showPin: true,
     note: {},
+    check: false,
     description: '',
     oneIcon: { icon: 'mdi-pin-outline', action: () => console.log('Pin-outline clicked') },
     twoIcon: { icon: 'mdi-pin', action: () => console.log('Pin clicked') }
   }),
-  emits: ['updateData', 'closeDialog', 'deleted'],
+  emits: [
+    'updateData',
+    'closeDialog',
+    'updateNotesInArchived',
+    'deleted',
+    'removeLabel',
+    'addLabelToNote'
+  ],
   watch: {
     dialog(newVal) {
       this.localDialog = newVal
@@ -82,6 +107,7 @@ export default {
     },
     onclickCheck(id) {
       console.log(id)
+      this.check = true
       this.clickedIndex = id
     },
     updateColor(item) {
@@ -104,6 +130,20 @@ export default {
           } else {
             this.showPin = true
           }
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    },
+    addLabelToNote() {
+      this.$emit('addLabelToNote')
+    },
+    removeLabel(labelId, noteId) {
+      console.log(noteId + ' n=======l ' + labelId)
+      removeLabelsOnNote(labelId, noteId)
+        .then((res) => {
+          console.log(res)
+          this.$emit('removeLabel')
         })
         .catch((error) => {
           console.log(error)
@@ -137,7 +177,10 @@ export default {
           outlined
           hover
           :style="{ backgroundColor: item.color }"
-          :class="{ check: clickedIndex === hoverIndex }"
+          :class="{
+            flexClass: this.$props.flex,
+            borderCheck: check
+          }"
         >
           <div class="pin-icon">
             <v-icon @click="pinned(item)" v-if="hoverIndex === item.id || menuCard === item.id">
@@ -145,10 +188,7 @@ export default {
             </v-icon>
           </div>
           <div class="check-card">
-            <v-icon
-              v-if="hoverIndex === item.id || menuCard === item.id"
-              @click="onclickCheck(item.id)"
-            >
+            <v-icon v-if="hoverIndex === item.id || menuCard === item.id" @click="check = !check">
               mdi-check-circle
             </v-icon>
           </div>
@@ -163,6 +203,17 @@ export default {
               <pre class="desc">{{ item.description }}</pre>
             </v-card-text>
           </div>
+          <span
+            v-for="l in item.noteLabels"
+            style="
+              background: rgba(0, 0, 0, 0.1);
+              margin-left: 10px;
+              padding: 5px;
+              font-size: x-small;
+              border-radius: 20px;
+            "
+            >{{ l.label }}<v-icon @click="removeLabel(l.id, item.id)">mdi-close</v-icon></span
+          >
 
           <div v-if="hoverIndex === item.id || menuCard === item.id">
             <IconButtons
@@ -171,10 +222,12 @@ export default {
               @updateNotes="updateNotes"
               @updateColor="updateColor"
               @deleted="deleted"
+              @addLabelToNote="addLabelToNote"
               :show1="true"
               :hoverIndex="item.id"
               :totalNotes="this.totalNotes"
               :labelsLists="this.list"
+              :noteLabels="item.noteLabels"
             />
           </div>
           <div style="height: 48px" v-else></div>
@@ -197,9 +250,8 @@ export default {
           @mouseover="hoverIndex = item.id"
           @mouseleave="hoverIndex = null"
           outlined
-          hover
           :style="{ backgroundColor: item.color }"
-          :class="{ check: clickedIndex === hoverIndex }"
+          :class="{ check: clickedIndex === hoverIndex, flexClass: this.$props.flex }"
         >
           <div class="pin-icon">
             <v-icon @click="pinned(item)" v-if="hoverIndex === item.id || menuCard === item.id">
@@ -225,7 +277,17 @@ export default {
               <pre class="desc">{{ item.description }}</pre>
             </v-card-text>
           </div>
-          <div v-for="l in list"></div>
+          <span
+            v-for="l in item.noteLabels"
+            style="
+              background: rgba(0, 0, 0, 0.1);
+              margin-left: 10px;
+              padding: 5px;
+              font-size: x-small;
+              border-radius: 20px;
+            "
+            >{{ l.label }} <v-icon>mdi-close</v-icon></span
+          >
 
           <div v-if="hoverIndex === item.id || menuCard === item.id">
             <IconButtons
@@ -233,10 +295,13 @@ export default {
               @changeStateLabels="changeStateLabels(item.id, $event)"
               @updateNotes="updateNotes"
               @updateColor="updateColor"
+              @addLabelToNote="addLabelToNote"
               :archived="this.archived"
               :show1="true"
               :hoverIndex="item.id"
               :totalNotes="this.totalNotes"
+              :labelsLists="this.list"
+              :noteLabels="item.noteLabels"
             />
           </div>
           <div style="height: 48px" v-else></div>
@@ -248,6 +313,12 @@ export default {
 </template>
 
 <style>
+.flexClass {
+  min-width: 100% !important;
+  height: fit-content !important;
+  border-radius: 20px !important;
+  margin-left: 500px !important;
+}
 code,
 kbd,
 pre,
@@ -256,13 +327,14 @@ samp {
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
 .title {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3; /* Show only 3 lines */
   overflow: hidden;
   max-height: calc(1.3em * 3); /* Adjust the value to match your line height and number of lines */
-  margin-bottom: -10px;
+  margin-bottom: -25px;
   font-size: larger;
 }
 
@@ -270,7 +342,7 @@ samp {
   font-size: smaller;
   font-weight: bold;
   color: gray;
-  margin-left: 2%;
+  margin-left: 1%;
   margin-bottom: -2%;
 }
 
@@ -281,7 +353,7 @@ samp {
   z-index: 1;
   overflow: visible;
 }
-.check {
+.borderCheck {
   border: 3px solid black !important;
 }
 

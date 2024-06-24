@@ -1,7 +1,7 @@
 <script>
 import SnackBar from './SnackBar.vue'
 import EditLabelDialog from './EditLabelDialog.vue'
-import { getAllLabels } from '../services/labelService'
+import { getAllLabels } from '../services/labelServices'
 
 export default {
   components: { SnackBar, EditLabelDialog },
@@ -13,14 +13,13 @@ export default {
     menu: false,
     snackbar: false,
     snackbarText: '',
-    flex: false,
     back: true,
     selectedIndex: 0,
     clickIndex: false,
     trashNotes: [],
-    flag: { name: '', noteFlag: false },
     localDialog: false,
     note: '',
+    flex: false,
     labelsList: [],
     items: [
       { title: 'Notes', value: 'notes', icon: 'mdi-lightbulb-outline' },
@@ -38,18 +37,18 @@ export default {
     dataChange(item, index) {
       this.selectedIndex = index
       this.clickIndex = false
-      if (item === 'trash') {
+      if (item.title === 'trash') {
         this.$router.push({ name: 'getAllTrashNotes' })
-      } else if (item === 'notes') {
+      } else if (item.title === 'notes') {
         this.$router.push({ name: 'getAllNotes' })
-      } else if (item === 'archived') {
+      } else if (item.title === 'archived') {
         this.$router.push({ name: 'getAllArchivedNotes' })
-      } else if (item === 'labels') {
+      } else if (item.title === 'labels') {
         this.openDialog(item)
-      } else if (item === 'reminders') {
+      } else if (item.title === 'reminders') {
         this.$router.push({ name: 'getAllReminders' })
       } else {
-        console.log('in label')
+        console.log('in label', item.value)
       }
     },
     onflexNotes() {
@@ -146,7 +145,14 @@ export default {
 
         <div class="btn-3">
           <v-btn icon="mdi-refresh" variant="text"></v-btn>
-          <v-btn icon="mdi-view-agenda-outline" @click="onflexNotes" variant="text"></v-btn>
+          <v-btn
+            v-if="flex"
+            icon="mdi-view-grid-outline"
+            @click="onflexNotes"
+            variant="text"
+          ></v-btn>
+          <v-btn v-else icon="mdi-view-agenda-outline" @click="onflexNotes" variant="text"></v-btn>
+
           <v-btn icon="mdi-cog-outline" variant="text"></v-btn>
         </div>
 
@@ -173,11 +179,11 @@ export default {
             :value="item.value"
             :class="[
               { 'back-color': selectedIndex === index && !clickIndex },
-              { clickChange: clickIndex && openRail && drawer && selectedIndex === index }
+              { clickChange: clickIndex && selectedIndex === index }
             ]"
             @mouseover="clickIndex = true"
             @mouseleave="clickIndex = false"
-            @click="dataChange(item.value, index)"
+            @click="dataChange(item, index)"
           >
             <template v-slot:prepend>
               <v-icon v-if="item.icon" :icon="item.icon" variant="text"></v-icon>
@@ -189,7 +195,7 @@ export default {
     </v-layout>
 
     <div class="default" :class="{ 'drawer-open noteinput': !openRail }">
-      <RouterView :trashNotes="trashNotes" :labelsList="labelsList" :flag="flag" />
+      <RouterView :trashNotes="trashNotes" :flex="flex" :labelsList="labelsList" />
     </div>
 
     <!-- Dialog box outside of the v-navigation-drawer to avoid multiple instances -->
@@ -243,7 +249,7 @@ export default {
     margin-left: 0px;
   }
   .search {
-    width: 50px;
+    width: 100%;
   }
 }
 
@@ -270,7 +276,7 @@ export default {
 }
 .back-color {
   background-color: #feefc3 !important;
-  border-radius: 40px !important;
+  border-radius: 60px !important;
 }
 .clickChange {
   background-color: #feefc3 !important;

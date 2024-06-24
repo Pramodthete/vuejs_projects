@@ -1,6 +1,7 @@
 <script>
 import SnackBar from './SnackBar.vue'
 import { updateArchivedNotes, updateColorNotes, deleteNote } from '@/services/noteServices'
+import { addLabelToNote, getLabelsOnNote } from '@/services/labelServices'
 
 export default {
   components: { SnackBar },
@@ -26,12 +27,17 @@ export default {
     },
     labelsLists: {
       type: Array
+    },
+    noteLabels: {
+      type: Array
     }
   },
   data: () => ({
     showMenu: false,
     showCheckboxMenu: false,
+    checkedValue: '',
     checkboxes: [],
+    checked: [],
 
     pick: true,
     menu: false,
@@ -42,7 +48,6 @@ export default {
     pin: false,
     index: null,
     subMenu: false,
-    selectedValues: [],
     reminders: [
       { title: 'Tomorrow', time: '8:00 PM', icon: '', c: false },
       { title: 'Next week', time: 'Mon, 8:00 PM', icon: '', c: false },
@@ -76,11 +81,6 @@ export default {
   }),
   emits: ['menuStateChanged', 'updateNotes', 'changeStateLabel'],
   methods: {
-    toggleCheckboxMenu(event) {
-      // this.showCheckboxMenu = !this.showCheckboxMenu
-      // this.$emit('changeState', this.menu)
-      event.stopPropagation()
-    },
     changeColor(color) {
       const data = { noteIdList: [this.$props.hoverIndex], color: color.color }
 
@@ -116,7 +116,11 @@ export default {
     },
     handleMenuClick(item, event) {
       if (item.title === 'Add Label') {
+        this.checked = this.$props.noteLabels
         this.checkboxes = this.$props.labelsLists
+        console.log(this.checkboxes)
+        console.log('checked', this.$props.noteLabels)
+        console.log('checkBox', this.$props.labelsLists)
         this.showCheckboxMenu = true
         this.showMenu = false
         this.$emit('changeStateLabel', this.showCheckboxMenu)
@@ -153,12 +157,32 @@ export default {
       this.$emit('menuStateChanged', this.menu)
       event.stopPropagation()
     },
-    updateSelectedValues() {
-      console.log(this.selectedValues)
+    updateSelectedValues(labelId) {
+      const tk = localStorage.getItem('loginToken')
+      let noteId = this.hoverIndex
+      addLabelToNote(noteId, labelId, tk)
+        .then((res) => {
+          console.log(res)
+          this.$emit('addLabelToNote')
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+      this.labelsOnNote()
+    },
+    labelsOnNote() {
+      getLabelsOnNote(this.hoverIndex)
+        .then((res) => {
+          console.log(res)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     }
   },
   mounted() {
     this.checkboxes = this.$props.labelsLists
+    this.checked = this.$props.noteLabels
   }
 }
 </script>
@@ -272,7 +296,7 @@ export default {
               style="font-size: smaller; margin-left: -8px; visibility: hidden"
               variant="text"
               v-bind="props"
-              @click.stop="toggleCheckboxMenu"
+              @click.stop="toggleMenu"
             >
             </v-btn>
           </template>
@@ -287,9 +311,9 @@ export default {
               <v-checkbox
                 class="check-box-label"
                 :value="checkbox.label"
-                v-model="selectedValues"
+                v-model="checked"
                 :label="checkbox.label"
-                @change="updateSelectedValues"
+                @change="updateSelectedValues(checkbox.id)"
               ></v-checkbox>
             </v-list-item>
           </v-list>

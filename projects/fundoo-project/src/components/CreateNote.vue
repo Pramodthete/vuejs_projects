@@ -143,7 +143,7 @@ export default {
   justify-content: center;
 }
 .inputs {
-  min-width: 600px;
+  width: 600px;
   position: relative;
   height: fit-content;
   box-shadow: 0px 1px 5px 0px rgb(144, 144, 144);
@@ -186,7 +186,7 @@ export default {
 
 @media screen and (max-width: 600px) {
   .inputs {
-    width: fit-content;
+    width: 100%;
   }
 }
 </style>

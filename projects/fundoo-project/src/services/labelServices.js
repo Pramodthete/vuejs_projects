@@ -1,4 +1,4 @@
-import { postData, getData, deleteData, patchData } from '../services/axiosServices'
+import { postData, getData, deleteData, patchData } from './axiosServices'
 const token = localStorage.getItem('loginToken')
 
 export const addLabels = (data) => {
@@ -48,9 +48,33 @@ export const updateLabels = (data, id) => {
   return patchData(url, data, headersOptions)
 }
 
-export const addLabelToNote = (noteId, labelId) => {
+export const addLabelToNote = (noteId, labelId, tk) => {
   console.log('in service label')
   let url = `notes/${noteId}/addLabelToNotes/${labelId}/add`
+  let data = {}
+  let headersOptions = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: tk
+    }
+  }
+  return postData(url, data, headersOptions)
+}
+
+export const getLabelsOnNote = (id) => {
+  let url = `notes/${id}/noteLabels`
+  let headersOptions = {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    }
+  }
+  return getData(url, headersOptions)
+}
+
+export const removeLabelsOnNote = (labelId, noteId) => {
+  let url = `notes/${noteId}/addLabelToNotes/${labelId}/remove`
+  let data = {}
   let headersOptions = {
     headers: {
       'Content-Type': 'application/json',
