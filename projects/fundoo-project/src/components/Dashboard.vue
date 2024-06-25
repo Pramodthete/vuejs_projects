@@ -37,15 +37,16 @@ export default {
     dataChange(item, index) {
       this.selectedIndex = index
       this.clickIndex = false
-      if (item.title === 'trash') {
+      if (item.value === 'trash') {
+        console.log(item.title)
         this.$router.push({ name: 'getAllTrashNotes' })
-      } else if (item.title === 'notes') {
+      } else if (item.value === 'notes') {
         this.$router.push({ name: 'getAllNotes' })
-      } else if (item.title === 'archived') {
+      } else if (item.value === 'archived') {
         this.$router.push({ name: 'getAllArchivedNotes' })
-      } else if (item.title === 'labels') {
+      } else if (item.value === 'labels') {
         this.openDialog(item)
-      } else if (item.title === 'reminders') {
+      } else if (item.value === 'reminders') {
         this.$router.push({ name: 'getAllReminders' })
       } else {
         console.log('in label', item.value)

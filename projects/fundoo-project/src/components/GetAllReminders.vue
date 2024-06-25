@@ -44,7 +44,6 @@ export default {
     <div style="margin-top: -7%">
       <DisplayNote
         :showPinR="false"
-        :flex="flex"
         @updateColor="updateColor"
         :totalNotes="remindersNotes"
       />

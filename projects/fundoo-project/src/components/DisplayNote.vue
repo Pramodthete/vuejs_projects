@@ -19,18 +19,6 @@ export default {
       type: Boolean,
       default: false
     },
-    flexA: {
-      type: Boolean,
-      default: false
-    },
-    flexR: {
-      type: Boolean,
-      default: false
-    },
-    flexT: {
-      type: Boolean,
-      default: false
-    },
     showPinT: {
       type: Boolean,
       default: true
@@ -46,6 +34,7 @@ export default {
   },
   data: () => ({
     show1: false,
+    overIndex: '',
     menu: false,
     snackbar: false,
     snackbarText: '',
@@ -86,7 +75,8 @@ export default {
         id: item.id,
         title: item.title,
         description: item.description,
-        color: item.color
+        color: item.color,
+        labels: item.noteLabels
       }
       console.log(this.note)
       console.log(this.localDialog)
@@ -204,15 +194,25 @@ export default {
             </v-card-text>
           </div>
           <span
+            @mouseover="overIndex = l.id"
+            @mouseleave="overIndex = null"
             v-for="l in item.noteLabels"
             style="
               background: rgba(0, 0, 0, 0.1);
               margin-left: 10px;
               padding: 5px;
-              font-size: x-small;
+              font-size: small;
               border-radius: 20px;
+              position: relative;
+              overflow: hidden;
             "
-            >{{ l.label }}<v-icon @click="removeLabel(l.id, item.id)">mdi-close</v-icon></span
+            >{{ l.label
+            }}<v-icon
+              class="remove"
+              v-if="overIndex == l.id && hoverIndex == item.id"
+              @click="removeLabel(l.id, item.id)"
+              >mdi-close</v-icon
+            ></span
           >
 
           <div v-if="hoverIndex === item.id || menuCard === item.id">
@@ -233,7 +233,7 @@ export default {
           <div style="height: 48px" v-else></div>
         </v-card>
       </template>
-      <DialogBox :note="note" @updateNotes="updateNotes" />
+      <DialogBox :pin="pin" @removeLabel="removeLabel" :note="note" @updateNotes="updateNotes" />
     </v-dialog>
   </div>
 
@@ -279,14 +279,24 @@ export default {
           </div>
           <span
             v-for="l in item.noteLabels"
+            @mouseover="overIndex = l.id"
+            @mouseleave="overIndex = null"
             style="
               background: rgba(0, 0, 0, 0.1);
               margin-left: 10px;
               padding: 5px;
-              font-size: x-small;
+              font-size: small;
               border-radius: 20px;
+              position: relative;
+              overflow: hidden;
             "
-            >{{ l.label }} <v-icon>mdi-close</v-icon></span
+            >{{ l.label }}
+            <v-icon
+              class="remove"
+              v-if="overIndex == l.id && hoverIndex == item.id"
+              @click="removeLabel(l.id, item.id)"
+              >mdi-close</v-icon
+            ></span
           >
 
           <div v-if="hoverIndex === item.id || menuCard === item.id">
@@ -307,7 +317,13 @@ export default {
           <div style="height: 48px" v-else></div>
         </v-card>
       </template>
-      <DialogBox :note="note" @dialogC="dialogC" @updateNotes="updateNotes" />
+      <DialogBox
+        :pin="pin"
+        @removeLabel="removeLabel"
+        :note="note"
+        @dialogC="dialogC"
+        @updateNotes="updateNotes"
+      />
     </v-dialog>
   </div>
 </template>
@@ -370,6 +386,14 @@ samp {
   border: 1px solid rgb(223, 221, 221);
   border-radius: 10px;
   overflow: visible !important;
+}
+
+.remove {
+  position: absolute !important;
+  left: 70%;
+  top: 15%;
+  background-color: rgba(234, 234, 234);
+  border-radius: 20px;
 }
 /*
 .note-card:hover .icon-buttons {

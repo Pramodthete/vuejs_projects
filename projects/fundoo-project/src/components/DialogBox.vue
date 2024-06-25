@@ -6,7 +6,7 @@ export default {
   data() {
     return {
       dialog: false,
-      pin: false,
+      pinD: this.pin,
       noteTitle: this.note?.title,
       noteDescription: this.note?.description,
       noteId: this.note?.id,
@@ -18,7 +18,8 @@ export default {
     }
   },
   props: {
-    note: Object
+    note: Object,
+    pin: Boolean
   },
   components: {
     IconButtons
@@ -53,7 +54,13 @@ export default {
         this.snackbarText = 'Data is not Edited ..'
         this.snackbar = true
       }
+    },
+    removeLabel() {
+      this.$emit('removeLabel')
     }
+  },
+  moonted() {
+    this.pinD = this.$props.pin
   }
 }
 </script>
@@ -73,10 +80,10 @@ export default {
         v-model="noteTitle"
       >
         <template v-slot:append-inner>
-          <v-icon v-if="!pin" @click="pin = !pin">
+          <v-icon v-if="!pinD" @click="pinD = !pinD">
             {{ oneIcon.icon }}
           </v-icon>
-          <v-icon v-if="pin" @click="pin = !pin">
+          <v-icon v-if="pinD" @click="pinD = !pinD">
             {{ twoIcon.icon }}
           </v-icon>
         </template>
@@ -93,6 +100,19 @@ export default {
         @click="show1 = true"
       ></v-textarea>
     </div>
+    <span
+      v-for="l in note.labels"
+      style="
+        background: rgba(0, 0, 0, 0.1);
+        margin-left: 10px;
+        padding: 5px;
+        font-size: x-small;
+        border-radius: 20px;
+        width: fit-content;
+        display: flex !important;
+      "
+      >{{ l.label }} <v-icon @click="removeLabel()">mdi-close</v-icon></span
+    >
     <div style="display: flex; justify-content: space-between">
       <div>
         <IconButtons :show1="true" />
