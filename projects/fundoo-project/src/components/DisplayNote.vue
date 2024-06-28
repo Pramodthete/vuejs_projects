@@ -54,6 +54,7 @@ export default {
     oneIcon: { icon: 'mdi-pin-outline', action: () => console.log('Pin-outline clicked') },
     twoIcon: { icon: 'mdi-pin', action: () => console.log('Pin clicked') }
   }),
+  // hello
   emits: [
     'updateData',
     'closeDialog',
@@ -133,6 +134,8 @@ export default {
       removeLabelsOnNote(labelId, noteId)
         .then((res) => {
           console.log(res)
+          this.snackbar = true
+          this.snackbarText = 'Label Deleted successfully'
           this.$emit('removeLabel')
         })
         .catch((error) => {
@@ -349,8 +352,8 @@ samp {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3; /* Show only 3 lines */
   overflow: hidden;
-  max-height: calc(1.3em * 3); /* Adjust the value to match your line height and number of lines */
-  margin-bottom: -25px;
+  max-height: calc(1.4em * 3); /* Adjust the value to match your line height and number of lines */
+  margin-bottom: -30px;
   font-size: larger;
 }
 

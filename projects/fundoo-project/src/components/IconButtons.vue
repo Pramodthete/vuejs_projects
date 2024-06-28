@@ -163,6 +163,8 @@ export default {
       addLabelToNote(noteId, labelId, tk)
         .then((res) => {
           console.log(res)
+          this.snackbar = true
+          this.snackbarText = 'Label Added successfully'
           this.$emit('addLabelToNote')
         })
         .catch((error) => {
@@ -278,7 +280,7 @@ export default {
             >
             </v-btn>
           </template>
-          <v-list v-if="!showCheckboxMenu || showMenu">
+          <v-list v-if="!showCheckboxMenu && showMenu">
             <v-list-item
               style="width: 200px"
               v-for="(item, index) in notesOptions"
