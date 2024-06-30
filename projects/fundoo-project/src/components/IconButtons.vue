@@ -35,9 +35,9 @@ export default {
   data: () => ({
     showMenu: false,
     showCheckboxMenu: false,
-    checkedValue: '',
     checkboxes: [],
-    checked: [],
+    checkedValues: [],
+    checkedId: '',
 
     pick: true,
     menu: false,
@@ -48,6 +48,7 @@ export default {
     pin: false,
     index: null,
     subMenu: false,
+    box: false,
     reminders: [
       { title: 'Tomorrow', time: '8:00 PM', icon: '', c: false },
       { title: 'Next week', time: 'Mon, 8:00 PM', icon: '', c: false },
@@ -116,11 +117,14 @@ export default {
     },
     handleMenuClick(item, event) {
       if (item.title === 'Add Label') {
-        this.checked = this.$props.noteLabels
-        this.checkboxes = this.$props.labelsLists
-        console.log(this.checkboxes)
-        console.log('checked', this.$props.noteLabels)
-        console.log('checkBox', this.$props.labelsLists)
+        this.checkedValues = this.$props.noteLabels
+
+        this.checkboxes = this.$props.labelsLists.map((label) => ({
+          ...label,
+          flag: this.checkedValues.some((checked) => checked.id === label.id)
+        }))
+        console.log('checked', this.checkedValues)
+        console.log('checkBox', this.checkboxes)
         this.showCheckboxMenu = true
         this.showMenu = false
         this.$emit('changeStateLabel', this.showCheckboxMenu)
@@ -157,10 +161,11 @@ export default {
       this.$emit('menuStateChanged', this.menu)
       event.stopPropagation()
     },
-    updateSelectedValues(labelId) {
+    updateSelectedValues(checkbox) {
       const tk = localStorage.getItem('loginToken')
       let noteId = this.hoverIndex
-      addLabelToNote(noteId, labelId, tk)
+
+      addLabelToNote(noteId, checkbox.id, tk)
         .then((res) => {
           console.log(res)
           this.snackbar = true
@@ -184,7 +189,7 @@ export default {
   },
   mounted() {
     this.checkboxes = this.$props.labelsLists
-    this.checked = this.$props.noteLabels
+    this.checkedValues = this.$props.noteLabels
   }
 }
 </script>
@@ -282,7 +287,7 @@ export default {
           </template>
           <v-list v-if="!showCheckboxMenu && showMenu">
             <v-list-item
-              style="width: 200px"
+              style="width: 180px; padding-left: 10px"
               v-for="(item, index) in notesOptions"
               :key="index"
               :value="index"
@@ -310,13 +315,17 @@ export default {
               </template>
             </v-text-field>
             <v-list-item v-for="checkbox in checkboxes" :key="checkbox.id">
-              <v-checkbox
+              <input
                 class="check-box-label"
+                type="checkbox"
+                v-model="checkbox.flag"
+                :checked="checkbox.flag"
+                :id="checkbox.id"
+                :name="checkbox.label"
                 :value="checkbox.label"
-                v-model="checked"
-                :label="checkbox.label"
-                @change="updateSelectedValues(checkbox.id)"
-              ></v-checkbox>
+                @change="updateSelectedValues(checkbox)"
+              />
+              <label :for="checkbox.id">{{ checkbox.label }}</label>
             </v-list-item>
           </v-list>
         </v-menu>
