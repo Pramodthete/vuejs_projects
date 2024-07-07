@@ -50,6 +50,7 @@ export default {
         this.$router.push({ name: 'getAllReminders' })
       } else {
         console.log('in label', item.value)
+        this.$router.push({ name: 'getAllNotes' })
       }
     },
     onflexNotes() {
@@ -128,7 +129,9 @@ export default {
           role="presentation"
           style="width: 40px; height: 40px"
         />
-        <v-toolbar-title id="title">Fundoo</v-toolbar-title>
+        <v-toolbar-title style="overflow: visible; text-overflow: initial" id="title"
+          >Fundoo</v-toolbar-title
+        >
 
         <v-card-text>
           <v-text-field
@@ -242,7 +245,7 @@ export default {
   padding-bottom: -12px;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 1270px) {
   .drawer-open {
     margin-left: 0px;
   }
@@ -250,10 +253,48 @@ export default {
     margin-left: 0px;
   }
   .search {
+    width: 100% !important;
+  }
+  .v-app-bar {
     width: 100%;
   }
 }
+@media screen and (max-width: 660px) {
+  .v-spacer {
+    display: none;
+  }
+  .btn-3 {
+    margin: 0;
+  }
+  #title {
+    width: 70px !important;
+  }
+}
+@media screen and (max-width: 500px) {
+  .v-app-bar {
+    overflow-x: scroll;
+  }
+  .v-card-text {
+    width: 10px !important;
+  }
+  .btn-avatar {
+    display: none !important;
+  }
+  .btn-3 {
+    margin-right: -2% !important;
+    gap: -5px !important;
+  }
+  .v-card-text {
+    padding: 0;
+    margin-right: -2% !important;
+    width: -20px !important;
+  }
+}
 
+.v-toolbar-title__placeholder {
+  overflow: unset !important;
+  text-overflow: initial !important;
+}
 .search {
   width: 700px;
   border-radius: 5px;
@@ -271,9 +312,13 @@ export default {
 .btn-3 {
   margin-right: 1.7%;
   color: gray;
+  display: flex;
+  flex-wrap: nowrap;
 }
 .btn-avatar {
   color: gray;
+  display: flex;
+  flex-wrap: nowrap;
 }
 .back-color {
   background-color: #feefc3 !important;

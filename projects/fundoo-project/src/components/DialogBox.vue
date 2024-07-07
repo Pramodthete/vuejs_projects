@@ -111,7 +111,7 @@ export default {
         width: fit-content;
         display: flex !important;
       "
-      >{{ l.label }} <v-icon @click="removeLabel()">mdi-close</v-icon></span
+      >{{ l.label }} <v-icon @click="removeLabel(l.id)">mdi-close</v-icon></span
     >
     <div style="display: flex; justify-content: space-between">
       <div>

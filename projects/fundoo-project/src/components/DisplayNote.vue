@@ -233,10 +233,15 @@ export default {
               :noteLabels="item.noteLabels"
             />
           </div>
-          <div style="height: 48px" v-else></div>
+          <div style="height: 45px" v-else></div>
         </v-card>
       </template>
-      <DialogBox :pin="pin" @removeLabel="removeLabel" :note="note" @updateNotes="updateNotes" />
+      <DialogBox
+        :pin="pin"
+        @removeLabel="removeLabel($event, hoverIndex)"
+        :note="note"
+        @updateNotes="updateNotes"
+      />
     </v-dialog>
   </div>
 
@@ -317,7 +322,7 @@ export default {
               :noteLabels="item.noteLabels"
             />
           </div>
-          <div style="height: 48px" v-else></div>
+          <div style="height: 45px" v-else></div>
         </v-card>
       </template>
       <DialogBox
@@ -350,9 +355,9 @@ samp {
 .title {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3; /* Show only 3 lines */
+  -webkit-line-clamp: 3;
   overflow: hidden;
-  max-height: calc(1.4em * 3); /* Adjust the value to match your line height and number of lines */
+  max-height: calc(1.4em * 3);
   margin-bottom: -30px;
   font-size: larger;
 }

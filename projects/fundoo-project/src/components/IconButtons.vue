@@ -308,8 +308,12 @@ export default {
             </v-btn>
           </template>
           <v-list style="width: 200px">
-            <div>Label Note</div>
-            <v-text-field placeholder="Enter Label Name" variant="plain">
+            <div style="margin-left: 5%">Label Note</div>
+            <v-text-field
+              style="margin-left: 5%; margin-right: 5%"
+              placeholder="Enter Label Name"
+              variant="plain"
+            >
               <template v-slot:append>
                 <v-icon> mdi-magnify </v-icon>
               </template>
@@ -325,7 +329,9 @@ export default {
                 :value="checkbox.label"
                 @change="updateSelectedValues(checkbox)"
               />
-              <label :for="checkbox.id">{{ checkbox.label }}</label>
+              <label style="margin-left: 10px; margin-top: -50px" :for="checkbox.id">{{
+                checkbox.label
+              }}</label>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -354,7 +360,7 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: left;
-  margin-left: -3px;
+  margin-left: 7px;
 }
 
 .pick {
@@ -374,8 +380,17 @@ export default {
   display: none;
 }
 .check-box-label {
-  height: 37px !important;
+  height: 15px !important;
   padding: 0 !important;
-  margin: 0 !important;
+  margin-left: 5% !important;
+}
+.v-btn__overlay,
+.v-btn__underlay {
+  width: fit-content;
+  height: fit-content;
+}
+.v-btn--icon.v-btn--density-default {
+  width: calc(var(--v-btn-height) + 9px);
+  height: calc(var(--v-btn-height) + 9px);
 }
 </style>

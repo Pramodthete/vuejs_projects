@@ -42,11 +42,7 @@ export default {
   <div>
     <CreateNote />
     <div style="margin-top: -7%">
-      <DisplayNote
-        :showPinR="false"
-        @updateColor="updateColor"
-        :totalNotes="remindersNotes"
-      />
+      <DisplayNote :showPinR="false" @updateColor="updateColor" :totalNotes="remindersNotes" />
     </div>
   </div>
 </template>
